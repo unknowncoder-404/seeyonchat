@@ -16,13 +16,13 @@ java {
 
 dependencies {
     // https://mvnrepository.com/artifact/com.vladsch.flexmark/flexmark
-//    implementation("com.vladsch.flexmark:flexmark:0.64.8")
+    implementation("com.vladsch.flexmark:flexmark:0.64.8")
 
 }
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.2.6")
+    version.set("2024.1.1")
     type.set("IC") // Target IDE Platform
 
     // https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
@@ -40,7 +40,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("223")
+        sinceBuild.set("221")
         untilBuild.set("241.*")
     }
 
