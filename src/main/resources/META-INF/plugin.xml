@@ -1,0 +1,67 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.seeyon.chat</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>致慧泉</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="shaozz@seeyon.com">shaozz</vendor>
+
+    <!--    &lt;!&ndash; Declare the default resource location for localizing menu strings &ndash;&gt;-->
+    <!--    <resource-bundle>messages.ChatBundle</resource-bundle>-->
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <!--    <description><![CDATA[-->
+    <!--    Enter short description for your plugin here.<br>-->
+    <!--    <em>most HTML tags may be used</em>-->
+    <!--  ]]></description>-->
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+<!--    <depends>org.intellij.plugins.markdown</depends>-->
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.seeyon.chat.settings.AppSettingsConfigurable"
+                id="com.seeyon.chat.settings.AppSettingsConfigurable"
+                displayName="致慧泉"/>
+        <toolWindow
+                factoryClass="com.seeyon.chat.toolWindow.ChatToolWindowFactory"
+                id="致慧泉"
+                anchor="right"
+                icon="/icons/toolWindow.png"/>
+        <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>
+
+    </extensions>
+
+    <actions>
+        <group id="CustomDefaultActionGroup"
+               class="com.seeyon.chat.action.CustomDefaultActionGroup"
+               text="致慧泉"
+               icon="/icons/action.png"
+               popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <action id="PromptAction1"
+                    class="com.seeyon.chat.action.PromptAction"
+                    text="解释代码"/>
+            <action id="PromptAction2"
+                    class="com.seeyon.chat.action.PromptAction"
+                    text="生成代码注释"/>
+            <action id="PromptAction3"
+                    class="com.seeyon.chat.action.PromptAction"
+                    text="生成优化建议"/>
+            <action id="PromptAction4"
+                    class="com.seeyon.chat.action.PromptAction"
+                    text="生成单元测试"/>
+        </group>
+    </actions>
+</idea-plugin>
