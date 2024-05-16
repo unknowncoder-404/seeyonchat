@@ -37,7 +37,7 @@ public class ChatHttpUtil {
     public static String createChatbot(String model) throws IOException, InterruptedException {
         Map<String, String> map = new HashMap<>();
         map.put("model", model);
-        map.put("name", ChatBundle.message("chatbot.name"));
+        map.put("name", ChatBundle.message("chatbot.name", model));
         map.put("prompt", ChatBundle.message("chatbot.prompt"));
         map.put("description", ChatBundle.message("chatbot.description"));
         String body = mapper.writeValueAsString(map);

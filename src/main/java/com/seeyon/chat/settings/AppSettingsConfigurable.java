@@ -50,7 +50,7 @@ public class AppSettingsConfigurable implements Configurable {
         if (Strings.isNotEmpty(settings.getApiKey()) && Strings.isEmpty(settings.getChatbotId())) {
             try {
                 // create chatbot
-                String chatbotId = ChatHttpUtil.createChatbot(settings.getModel());
+                String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
                 settings.putChatbotId(chatbotId);
             } catch (Exception e) {
                 // 弹窗

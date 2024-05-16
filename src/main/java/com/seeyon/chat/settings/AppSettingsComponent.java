@@ -12,14 +12,9 @@ import javax.swing.*;
  */
 public class AppSettingsComponent {
 
-    private static final String[] comboboxItemsString = {
-            "gpt-3.5-turbo",
-            "gpt-4"
-    };
-
     private final JPanel mainPanel;
     private final JBPasswordField apiKeyField = new JBPasswordField();
-    private final JComboBox<String> modelCombobox = new ComboBox<>(comboboxItemsString);
+    private final JComboBox<String> modelCombobox = new ComboBox<>(Constant.comboBoxModel);
 
     public AppSettingsComponent() {
         mainPanel = FormBuilder.createFormBuilder()

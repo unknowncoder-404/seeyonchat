@@ -121,7 +121,7 @@ public final class ChatToolWindowService {
             } catch (RuntimeException e) {
                 if ("Chatbot not found.".equals(e.getMessage())) {
                     // create chatbot
-                    String chatbotId = ChatHttpUtil.createChatbot(settings.getModel());
+                    String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
                     settings.putChatbotId(chatbotId);
 
                     chatId = ChatHttpUtil.createChat(chatbotId);

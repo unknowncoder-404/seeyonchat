@@ -64,6 +64,10 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         this.model = model;
     }
 
+    public String findModel() {
+        return Constant.modelMap.get(model);
+    }
+
     public String getChatbotId() {
         return chatbotMap.get(model);
     }
