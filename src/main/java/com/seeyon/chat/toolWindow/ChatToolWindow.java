@@ -1,6 +1,8 @@
 package com.seeyon.chat.toolWindow;
 
 import com.intellij.ui.OnePixelSplitter;
+import com.seeyon.chat.ui.ChatBoxComponent;
+import com.seeyon.chat.ui.SearchBoxComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,8 +20,8 @@ public class ChatToolWindow {
     private final SearchBoxComponent searchBoxComponent = new SearchBoxComponent();
 
     public ChatToolWindow() {
-        splitter.setFirstComponent(chatBoxComponent);
-        splitter.setSecondComponent(searchBoxComponent);
+        splitter.setFirstComponent(chatBoxComponent.getComponent());
+        splitter.setSecondComponent(searchBoxComponent.getComponent());
     }
 
     public JComponent getContentPanel() {
@@ -34,23 +36,27 @@ public class ChatToolWindow {
         return searchBoxComponent;
     }
 
-    public void aroundSend(boolean hasBeen) {
-        if (hasBeen) {
-            searchBoxComponent.remove(searchBoxComponent.getStopButton());
-            searchBoxComponent.add(searchBoxComponent.getSendButton(), BorderLayout.EAST);
+    public void aroundSend(boolean actionState) {
+        if (actionState) {
+            // stop action
+            searchBoxComponent.getComponent().remove(searchBoxComponent.getStopButton());
+            searchBoxComponent.getComponent().add(searchBoxComponent.getSendButton(), BorderLayout.EAST);
 
             chatBoxComponent.removeScrollListener();
+            chatBoxComponent.removeLoader();
         } else {
-            searchBoxComponent.add(searchBoxComponent.getStopButton(), BorderLayout.EAST);
-            searchBoxComponent.remove(searchBoxComponent.getSendButton());
+            // send action
+            searchBoxComponent.getComponent().add(searchBoxComponent.getStopButton(), BorderLayout.EAST);
+            searchBoxComponent.getComponent().remove(searchBoxComponent.getSendButton());
             searchBoxComponent.getTextArea().setText("");
 
             chatBoxComponent.addScrollListener();
+            chatBoxComponent.addLoader();
         }
-        searchBoxComponent.getTextArea().setEnabled(hasBeen);
+        searchBoxComponent.getTextArea().setEnabled(actionState);
 
-        searchBoxComponent.revalidate();// 重新计算布局
-        searchBoxComponent.repaint();// 刷新界面
+        searchBoxComponent.getComponent().revalidate();// 重新计算布局
+        searchBoxComponent.getComponent().repaint();// 刷新界面
     }
 
 }

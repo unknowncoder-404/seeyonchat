@@ -4,6 +4,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPasswordField;
 import com.intellij.util.ui.FormBuilder;
+import com.seeyon.chat.common.ChatConstants;
 
 import javax.swing.*;
 
@@ -14,9 +15,12 @@ public class AppSettingsComponent {
 
     private final JPanel mainPanel;
     private final JBPasswordField apiKeyField = new JBPasswordField();
-    private final JComboBox<String> modelCombobox = new ComboBox<>(Constant.comboBoxModel);
+    private final JComboBox<String> modelCombobox;
 
     public AppSettingsComponent() {
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(ChatConstants.MODEL_MAP.keySet().toArray(new String[0]));
+        modelCombobox = new ComboBox<>(comboBoxModel);
+
         mainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("API key"), apiKeyField)
                 .addLabeledComponent(new JBLabel("Model"), modelCombobox)

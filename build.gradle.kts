@@ -18,6 +18,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.vladsch.flexmark/flexmark
     implementation("com.vladsch.flexmark:flexmark:0.64.8")
 
+//    implementation(fileTree("libs"))
+
+    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
+    implementation("com.fifesoft:rsyntaxtextarea:3.4.0")
 }
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html

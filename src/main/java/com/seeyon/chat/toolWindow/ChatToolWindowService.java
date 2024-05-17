@@ -11,6 +11,8 @@ import com.intellij.openapi.util.text.Strings;
 import com.seeyon.chat.listener.ChatMessageSubscriber;
 import com.seeyon.chat.settings.AppSettingsConfigurable;
 import com.seeyon.chat.settings.AppSettingsState;
+import com.seeyon.chat.ui.ChatBoxComponent;
+import com.seeyon.chat.ui.ChatComponent;
 import com.seeyon.chat.utils.ChatHttpUtil;
 import com.seeyon.chat.utils.NotificationUtil;
 
@@ -67,16 +69,17 @@ public final class ChatToolWindowService {
         if (!lock.compareAndSet(false, true)) {
             return;
         }
+
+        // add the conversation component to chatBox
+        ChatBoxComponent chatBoxComponent = chatToolWindow.getChatBoxComponent();
+        chatBoxComponent.addChat(ChatComponent.ofQuestion(data).getComponent());
+
         // before send
         chatToolWindow.aroundSend(false);
 
-        // add the conversation component to chatBox
-        ChatPanel answer = new ChatPanel(null, false);
-        chatToolWindow.getChatBoxComponent().addChats(new ChatPanel(data, true), answer);
-
         // send message
         try {
-            future = ChatHttpUtil.sendMessage(getChatId(), data, new ChatMessageSubscriber(answer));
+            future = ChatHttpUtil.sendMessage(getChatId(), data, new ChatMessageSubscriber(chatBoxComponent));
         } catch (Exception e) {
             NotificationUtil.error(e.getMessage());
 

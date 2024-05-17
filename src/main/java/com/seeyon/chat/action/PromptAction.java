@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.seeyon.chat.toolWindow.ChatToolWindowService;
+import com.seeyon.chat.utils.ChatBundle;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,7 +23,7 @@ public class PromptAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ToolWindow toolWindow = ToolWindowManager.getInstance(e.getProject()).getToolWindow("致慧泉");
+        ToolWindow toolWindow = ToolWindowManager.getInstance(e.getProject()).getToolWindow(ChatBundle.message("plugin.name"));
         if (!toolWindow.isActive()) {
             toolWindow.activate(null);
         }
@@ -32,7 +33,7 @@ public class PromptAction extends AnAction {
 
         String prompt = e.getPresentation().getText();
 
-        String questionContent = prompt + "\n" + "```\n" + selectedText + "\n```";
+        String questionContent = "<p>" +prompt + "</p>\n" + "<pre><code>" + selectedText + "</code></pre>";
 
         ChatToolWindowService.getInstance().actionPerformed(questionContent);
     }

@@ -7,6 +7,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Transient;
+import com.seeyon.chat.common.ChatConstants;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     }
 
     public String findModel() {
-        return Constant.modelMap.get(model);
+        return ChatConstants.MODEL_MAP.get(model);
     }
 
     public String getChatbotId() {

@@ -2,8 +2,9 @@ package com.seeyon.chat.listener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seeyon.chat.toolWindow.ChatPanel;
 import com.seeyon.chat.toolWindow.ChatToolWindowService;
+import com.seeyon.chat.ui.ChatBoxComponent;
+import com.seeyon.chat.ui.ChatComponent;
 import com.seeyon.chat.utils.NotificationUtil;
 
 import javax.swing.*;
@@ -22,15 +23,21 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
 
     private Flow.Subscription subscription;
 
-    private final ChatPanel answer;
+    private final ChatBoxComponent chatBoxComponent;
 
-    public ChatMessageSubscriber(ChatPanel answer) {
-        this.answer = answer;
+    private final ChatComponent answer;
+
+    public ChatMessageSubscriber(ChatBoxComponent chatBoxComponent) {
+        this.chatBoxComponent = chatBoxComponent;
+        answer = ChatComponent.ofAnswer();
     }
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
-        SwingUtilities.invokeLater(answer::removeLoader);
+        SwingUtilities.invokeLater(() -> {
+            chatBoxComponent.removeLoader();
+            chatBoxComponent.addChat(answer.getComponent());
+        });
 
         this.subscription = subscription;
         subscription.request(1);

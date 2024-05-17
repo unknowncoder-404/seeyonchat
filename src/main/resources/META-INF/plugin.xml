@@ -40,6 +40,7 @@
         <toolWindow
                 factoryClass="com.seeyon.chat.toolWindow.ChatToolWindowFactory"
                 id="致慧泉"
+                secondary="true"
                 anchor="right"
                 icon="/icons/toolWindow.png"/>
         <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>

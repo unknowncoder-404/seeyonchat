@@ -25,28 +25,4 @@ public class MarkdownUtil {
         return renderer.render(document);
     }
 
-//    public static JComponent createPreviewComponent(String content) {
-//        Project project = ProjectManager.getInstance().getDefaultProject();
-//
-//        LightVirtualFile file = new LightVirtualFile();
-////        MarkdownJCEFHtmlPanel panel = new MarkdownJCEFHtmlPanel(project, file);
-//        MarkdownJCEFHtmlPanel panel = new MarkdownJCEFHtmlPanel();
-//
-//        // Ensure the HTML generation and UI updates are run in the appropriate thread
-//        String html = UIUtil.invokeAndWaitIfNeeded(() -> org.intellij.plugins.markdown.ui.preview.html.MarkdownUtil.INSTANCE.generateMarkdownHtml(file, content, project));
-//
-//        panel.setHtml(html, 0);
-//        return panel.getComponent();
-//    }
-
-//    public static JComponent demo() {
-//        InputStream resourceAsStream = MarkdownUtil.class.getResourceAsStream("/Demo.md");
-//        try {
-//            String markdownContent = IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
-//            return createPreviewComponent(markdownContent);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
 }

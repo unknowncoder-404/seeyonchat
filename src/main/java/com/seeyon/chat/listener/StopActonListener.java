@@ -17,11 +17,7 @@ public class StopActonListener implements ActionListener {
         if (service.getFuture() != null) {
             service.getFuture().cancel(true);
         }
-        SwingUtilities.invokeLater(() -> {
-            service.getChatToolWindow().aroundSend(true);
-
-            service.getChatToolWindow().getChatBoxComponent().removeLoader();
-        });
+        SwingUtilities.invokeLater(() -> service.getChatToolWindow().aroundSend(true));
         service.unlock();
     }
 }

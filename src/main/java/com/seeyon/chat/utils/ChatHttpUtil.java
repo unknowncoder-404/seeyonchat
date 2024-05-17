@@ -3,6 +3,7 @@ package com.seeyon.chat.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seeyon.chat.settings.AppSettingsState;
+import com.seeyon.chat.common.ChatConstants;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,7 +25,6 @@ import java.util.concurrent.Flow;
  */
 public class ChatHttpUtil {
 
-    private static final String baseUrl = "https://seeyon.chat/api";
 
     private static final HttpClient client = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
@@ -43,7 +43,7 @@ public class ChatHttpUtil {
         String body = mapper.writeValueAsString(map);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/chatbots"))
+                .uri(URI.create(ChatConstants.BASE_URL + "/chatbots"))
                 .headers(buildHeaders())
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .timeout(Duration.ofSeconds(10))
@@ -65,7 +65,7 @@ public class ChatHttpUtil {
         String body = mapper.writeValueAsString(map);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/chats"))
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats"))
                 .headers(buildHeaders())
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .timeout(Duration.ofSeconds(10))
@@ -87,7 +87,7 @@ public class ChatHttpUtil {
         String body = mapper.writeValueAsString(map);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/chats/" + chatId + "/messages"))
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId + "/messages"))
                 .headers(buildHeaders())
                 .header("Accept", "text/event-stream")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
