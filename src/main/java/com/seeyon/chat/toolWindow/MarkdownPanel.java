@@ -13,7 +13,7 @@ import java.awt.*;
  */
 public class MarkdownPanel extends HtmlPanel {
 
-    private final StringBuilder content = new StringBuilder();
+    private final StringBuffer content = new StringBuffer();
 
     @Override
     protected @NotNull @Nls String getBody() {
