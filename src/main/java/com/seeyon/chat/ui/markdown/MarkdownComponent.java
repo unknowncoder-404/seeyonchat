@@ -109,9 +109,13 @@ public class MarkdownComponent {
                 return SyntaxConstants.SYNTAX_STYLE_CSS;
             case "c":
                 return SyntaxConstants.SYNTAX_STYLE_C;
+            case "c++":
+                return SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
+            case "csharp":
+                return SyntaxConstants.SYNTAX_STYLE_CSHARP;
             case "clojure":
                 return SyntaxConstants.SYNTAX_STYLE_CLOJURE;
-            case "golang":
+            case "go":
                 return SyntaxConstants.SYNTAX_STYLE_GO;
             case "groovy":
                 return SyntaxConstants.SYNTAX_STYLE_GROOVY;
