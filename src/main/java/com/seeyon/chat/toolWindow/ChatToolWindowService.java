@@ -100,7 +100,11 @@ public final class ChatToolWindowService {
 
         // create new chatId
         AppSettingsState settings = AppSettingsState.getInstance();
-        settings.setChatId(ChatHttpUtil.createChat(settings.getChatbotId()));
+        if (Strings.isEmpty(settings.getApiKey())) {
+            settings.setChatId(null);
+        } else {
+            settings.setChatId(ChatHttpUtil.createChat(settings.getChatbotId()));
+        }
     }
 
     private boolean checkSettings() {
