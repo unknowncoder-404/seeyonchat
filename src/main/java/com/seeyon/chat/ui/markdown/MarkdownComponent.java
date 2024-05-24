@@ -2,15 +2,12 @@ package com.seeyon.chat.ui.markdown;
 
 import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.HtmlPanel;
+import com.seeyon.chat.ui.CodePanel;
 import com.seeyon.chat.utils.MarkdownUtil;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rsyntaxtextarea.Theme;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,8 +15,6 @@ import java.util.regex.Pattern;
  * @author Shaozz
  */
 public class MarkdownComponent {
-
-    private static final Theme theme;
 
     protected static final Pattern pattern;
 
@@ -51,8 +46,7 @@ public class MarkdownComponent {
             // Add the code block with RSyntaxTextArea
             String code = matcher.group(2);
             String language = matcher.group(1);
-            RSyntaxTextArea codeArea = createCodeArea(code, language);
-            mainPanel.add(codeArea);
+            mainPanel.add(createCodeArea(code, language));
 
             lastEnd = matcher.end();
         }
@@ -79,79 +73,11 @@ public class MarkdownComponent {
         return textPane;
     }
 
-    protected static RSyntaxTextArea createCodeArea(String code, String language) {
-        RSyntaxTextArea codeArea = new RSyntaxTextArea();
-        codeArea.setText(code);
-        codeArea.setEditable(false);
-        codeArea.setSyntaxEditingStyle(getSyntaxStyle(language));
-        codeArea.setLineWrap(true);
-        codeArea.setWrapStyleWord(true);
-        codeArea.setPopupMenu(null);// Remove the default right-click menu
-
-        theme.apply(codeArea);// Apply the theme to the code area
-        return codeArea;
-    }
-
-    private static String getSyntaxStyle(String language) {
-        if (language == null) {
-            return SyntaxConstants.SYNTAX_STYLE_NONE;
-        }
-        switch (language.toLowerCase()) {
-            case "java":
-                return SyntaxConstants.SYNTAX_STYLE_JAVA;
-            case "python":
-                return SyntaxConstants.SYNTAX_STYLE_PYTHON;
-            case "javascript":
-                return SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT;
-            case "html":
-                return SyntaxConstants.SYNTAX_STYLE_HTML;
-            case "css":
-                return SyntaxConstants.SYNTAX_STYLE_CSS;
-            case "c":
-                return SyntaxConstants.SYNTAX_STYLE_C;
-            case "c++":
-                return SyntaxConstants.SYNTAX_STYLE_CPLUSPLUS;
-            case "csharp":
-                return SyntaxConstants.SYNTAX_STYLE_CSHARP;
-            case "clojure":
-                return SyntaxConstants.SYNTAX_STYLE_CLOJURE;
-            case "go":
-                return SyntaxConstants.SYNTAX_STYLE_GO;
-            case "groovy":
-                return SyntaxConstants.SYNTAX_STYLE_GROOVY;
-            case "json":
-                return SyntaxConstants.SYNTAX_STYLE_JSON;
-            case "jsp":
-                return SyntaxConstants.SYNTAX_STYLE_JSP;
-            case "kotlin":
-                return SyntaxConstants.SYNTAX_STYLE_KOTLIN;
-            case "lua":
-                return SyntaxConstants.SYNTAX_STYLE_LUA;
-            case "php":
-                return SyntaxConstants.SYNTAX_STYLE_PHP;
-            case "ruby":
-                return SyntaxConstants.SYNTAX_STYLE_RUBY;
-            case "sql":
-                return SyntaxConstants.SYNTAX_STYLE_SQL;
-            case "typescript":
-                return SyntaxConstants.SYNTAX_STYLE_TYPESCRIPT;
-            case "xml":
-                return SyntaxConstants.SYNTAX_STYLE_XML;
-            case "yaml":
-                return SyntaxConstants.SYNTAX_STYLE_YAML;
-            // Add more languages as needed
-            default:
-                return SyntaxConstants.SYNTAX_STYLE_NONE;
-        }
+    protected static CodePanel createCodeArea(String code, String language) {
+        return new CodePanel(code, language);
     }
 
     static {
         pattern = Pattern.compile("```(\\w+)?\\n([\\s\\S]*?)\\n```");
-        try {
-            theme = Theme.load(MarkdownComponent.class.getResourceAsStream(
-                    "/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
