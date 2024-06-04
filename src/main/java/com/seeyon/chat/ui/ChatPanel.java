@@ -11,44 +11,39 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.util.List;
 
 /**
  * @author Shaozz
  */
-public class ChatBoxComponent {
-
-    private final JBScrollPane mainPanel;
+public class ChatPanel extends JBScrollPane {
 
     private final JPanel contentPanel;
 
     private final MyAdjustmentListener scrollListener = new MyAdjustmentListener();
 
-    private JPanel loaderPanel;
+    private final RoundRectPanel loaderPanel;
 
-    public ChatBoxComponent() {
+    public ChatPanel() {
         contentPanel = new JPanel(new VerticalLayout(JBUI.scale(10)));
         contentPanel.setBorder(JBUI.Borders.empty(10));
 
-        mainPanel = new JBScrollPane(contentPanel);
-        mainPanel.setBorder(JBUI.Borders.empty());
-        mainPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        mainPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        mainPanel.getVerticalScrollBar().setAutoscrolls(true);
+        setViewportView(contentPanel);
+        setBorder(JBUI.Borders.empty());
+        setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        getVerticalScrollBar().setAutoscrolls(true);
 
         // Add loaderLabel
-        loaderPanel = new JPanel(new BorderLayout());
+        loaderPanel = new RoundRectPanel(new BorderLayout());
         loaderPanel.setBorder(JBUI.Borders.empty(10));
         loaderPanel.setBackground(ChatColor.ANSWER_BG_COLOR);
         JLabel label = new JLabel(ChatBundle.message("ui.chat.loader"), new AnimatedIcon.Default(), SwingConstants.LEFT);
         loaderPanel.add(label, BorderLayout.WEST);
     }
 
-    public JComponent getComponent() {
-        return mainPanel;
-    }
-
-    public void addChat(JComponent component) {
-        contentPanel.add(component);
+    public void addChat(ChatCell cell) {
+        contentPanel.add(cell);
 
         contentPanel.revalidate();// 重新计算布局
         contentPanel.repaint();// 刷新界面
@@ -56,6 +51,14 @@ public class ChatBoxComponent {
 
     public void removeAllChats() {
         contentPanel.removeAll();
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
+    public void replaceAllChats(List<ChatCell> chatCells) {
+        contentPanel.removeAll();
+        chatCells.forEach(contentPanel::add);
 
         contentPanel.revalidate();
         contentPanel.repaint();
@@ -70,12 +73,12 @@ public class ChatBoxComponent {
     }
 
     public void addScrollListener() {
-        mainPanel.getVerticalScrollBar().
+        getVerticalScrollBar().
                 addAdjustmentListener(scrollListener);
     }
 
     public void removeScrollListener() {
-        mainPanel.getVerticalScrollBar().
+        getVerticalScrollBar().
                 removeAdjustmentListener(scrollListener);
     }
 

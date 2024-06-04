@@ -5,10 +5,8 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.seeyon.chat.toolWindow.ChatToolWindowService;
-import com.seeyon.chat.utils.ChatBundle;
+import com.seeyon.chat.core.service.ChatService;
+import com.seeyon.chat.toolWindow.ChatToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,10 +21,7 @@ public class PromptAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ToolWindow toolWindow = ToolWindowManager.getInstance(e.getProject()).getToolWindow(ChatBundle.message("plugin.name"));
-        if (!toolWindow.isActive()) {
-            toolWindow.activate(null);
-        }
+        ChatToolWindowFactory.showToolWindow(e.getProject());
         Editor editor = e.getData(CommonDataKeys.EDITOR);
         assert editor != null;
         String selectedText = editor.getSelectionModel().getSelectedText();
@@ -35,11 +30,11 @@ public class PromptAction extends AnAction {
 
         String questionContent = "<p>" +prompt + "</p>\n" + "<pre><code>" + selectedText + "</code></pre>";
 
-        ChatToolWindowService.getInstance().actionPerformed(questionContent);
+        ChatService.getInstance().actionPerformed(questionContent);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!ChatToolWindowService.getInstance().isLocked());
+        e.getPresentation().setEnabled(!ChatService.getInstance().isLocked());
     }
 }

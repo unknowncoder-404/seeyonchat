@@ -1,7 +1,8 @@
 package com.seeyon.chat.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.seeyon.chat.core.model.Chat;
 import com.seeyon.chat.settings.AppSettingsState;
 import com.seeyon.chat.common.ChatConstants;
 
@@ -25,14 +26,11 @@ import java.util.concurrent.Flow;
  */
 public class ChatHttpUtil {
 
-
     private static final HttpClient client = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(Duration.ofMinutes(30))
             .executor(Executors.newSingleThreadExecutor())
             .build();
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     public static String createChatbot(String model) throws IOException, InterruptedException {
         Map<String, String> map = new HashMap<>();
@@ -40,7 +38,7 @@ public class ChatHttpUtil {
         map.put("name", ChatBundle.message("chatbot.name", model));
         map.put("prompt", ChatBundle.message("chatbot.prompt"));
         map.put("description", ChatBundle.message("chatbot.description"));
-        String body = mapper.writeValueAsString(map);
+        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chatbots"))
@@ -50,7 +48,7 @@ public class ChatHttpUtil {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        Map result = mapper.readValue(response.body(), Map.class);
+        Map result = ChatConstants.OBJECT_MAPPER.readValue(response.body(), Map.class);
         String message = (String) result.get("message");
         if ("Chatbot created successfully.".equals(message)) {
             Map data = (Map) result.get("data");
@@ -62,7 +60,7 @@ public class ChatHttpUtil {
 
     public static String createChat(String chatbotId) throws IOException, InterruptedException {
         Map<String, String> map = Collections.singletonMap("chatbotId", chatbotId);
-        String body = mapper.writeValueAsString(map);
+        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats"))
@@ -72,7 +70,7 @@ public class ChatHttpUtil {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        Map result = mapper.readValue(response.body(), Map.class);
+        Map result = ChatConstants.OBJECT_MAPPER.readValue(response.body(), Map.class);
         Object id = result.get("_id");
         if (id == null) {
             throw new RuntimeException((String) result.get("message"));
@@ -84,7 +82,7 @@ public class ChatHttpUtil {
         Map<String, String> map = new HashMap<>();
         map.put("role", "user");
         map.put("content", content);
-        String body = mapper.writeValueAsString(map);
+        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId + "/messages"))
@@ -100,4 +98,47 @@ public class ChatHttpUtil {
         return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
     }
 
+    public static List<Chat> getChats(String chatbotId) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats"))
+                .headers(buildHeaders())
+                .GET()
+                .timeout(Duration.ofSeconds(10))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        List<Chat> chats = ChatConstants.OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
+        });
+        return chats.stream().filter(chat -> chatbotId.equals(chat.getChatbotId())).toList();
+    }
+
+    public static Chat getChat(String chatId) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId))
+                .headers(buildHeaders())
+                .GET()
+                .timeout(Duration.ofSeconds(10))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        try {
+            return ChatConstants.OBJECT_MAPPER.readValue(response.body(), Chat.class);
+        } catch (JsonProcessingException e) {
+            Map result = ChatConstants.OBJECT_MAPPER.readValue(response.body(), Map.class);
+            Object message = result.get("message");
+            if (message != null) {
+                throw new RuntimeException((String) message);
+            }
+            throw e;
+        }
+    }
+
+    public static void deleteChat(String chatId) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId))
+                .headers(buildHeaders())
+                .DELETE()
+                .timeout(Duration.ofSeconds(10))
+                .build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
 }

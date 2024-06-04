@@ -1,10 +1,10 @@
-package com.seeyon.chat.listener;
+package com.seeyon.chat.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seeyon.chat.toolWindow.ChatToolWindowService;
-import com.seeyon.chat.ui.ChatBoxComponent;
-import com.seeyon.chat.ui.ChatComponent;
+import com.seeyon.chat.common.ChatConstants;
+import com.seeyon.chat.core.service.ChatService;
+import com.seeyon.chat.ui.ChatPanel;
+import com.seeyon.chat.ui.ChatCell;
 import com.seeyon.chat.utils.NotificationUtil;
 
 import javax.swing.*;
@@ -19,24 +19,22 @@ import java.util.concurrent.Flow;
  */
 public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private Flow.Subscription subscription;
 
-    private final ChatBoxComponent chatBoxComponent;
+    private final ChatPanel chatPanel;
 
-    private final ChatComponent answer;
+    private final ChatCell answer;
 
-    public ChatMessageSubscriber(ChatBoxComponent chatBoxComponent) {
-        this.chatBoxComponent = chatBoxComponent;
-        answer = ChatComponent.ofAnswer();
+    public ChatMessageSubscriber(ChatPanel chatPanel) {
+        this.chatPanel = chatPanel;
+        answer = ChatCell.ofAnswer();
     }
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
         SwingUtilities.invokeLater(() -> {
-            chatBoxComponent.removeLoader();
-            chatBoxComponent.addChat(answer.getComponent());
+            chatPanel.removeLoader();
+            chatPanel.addChat(answer);
         });
 
         this.subscription = subscription;
@@ -56,7 +54,7 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
             while (index < s.length()) {
                 try {
                     // 从当前索引开始解析JSON对象
-                    JsonNode node = mapper.readTree(s.substring(index));
+                    JsonNode node = ChatConstants.OBJECT_MAPPER.readTree(s.substring(index));
                     if (node.has("content")) {
                         sb.append(node.get("content").asText());
                     }
@@ -77,15 +75,12 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
         if (throwable instanceof IOException) {
             return;
         }
-        SwingUtilities.invokeLater(() -> {
-            ChatToolWindowService.getInstance().stopGenerating();
-            // notify
-            NotificationUtil.error(throwable.getMessage());
-        });
+        ChatService.getInstance().stopGenerating();
+        SwingUtilities.invokeLater(() -> NotificationUtil.error(throwable.getMessage()));
     }
 
     @Override
     public void onComplete() {
-        SwingUtilities.invokeLater(() -> ChatToolWindowService.getInstance().stopGenerating());
+        ChatService.getInstance().stopGenerating();
     }
 }

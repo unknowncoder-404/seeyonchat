@@ -1,6 +1,7 @@
 package com.seeyon.chat.common;
 
-import com.intellij.openapi.application.ApplicationInfo;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
@@ -16,6 +17,13 @@ public class ChatConstants {
             "GPT-4", "gpt-4v"
     );
 
-    public static final String IDE_NAME = ApplicationInfo.getInstance().getVersionName();
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+//    public static final String IDE_NAME = ApplicationInfo.getInstance().getVersionName();
+
+    static {
+        // 配置ObjectMapper在反序列化时忽略未知属性
+        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
 }

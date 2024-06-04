@@ -1,6 +1,6 @@
 package com.seeyon.chat.listener;
 
-import com.seeyon.chat.toolWindow.ChatToolWindowService;
+import com.seeyon.chat.core.service.ChatService;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,14 +16,13 @@ public class SendActionListener extends KeyAdapter implements ActionListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isControlDown() && !e.isShiftDown()) {
             e.consume();
-            ChatToolWindowService.getInstance().getChatToolWindow().getSearchBoxComponent().getSendButton().doClick();
+            ChatService.getInstance().actionPerformed();
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        String data = ChatToolWindowService.getInstance().getChatToolWindow().getSearchBoxComponent().getTextArea().getText();
-        ChatToolWindowService.getInstance().actionPerformed(data);
+        ChatService.getInstance().actionPerformed();
     }
 
 }

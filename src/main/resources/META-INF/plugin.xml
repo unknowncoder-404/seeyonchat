@@ -44,7 +44,6 @@
                 anchor="right"
                 icon="/icons/toolWindow.png"/>
         <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>
-
     </extensions>
 
     <actions>

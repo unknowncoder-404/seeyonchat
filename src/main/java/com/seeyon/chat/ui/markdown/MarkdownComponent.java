@@ -39,8 +39,8 @@ public class MarkdownComponent {
             // Add the text before the code block
             String textBeforeCode = markdownContent.substring(lastEnd, matcher.start());
             if (!textBeforeCode.isEmpty()) {
-                HtmlPanel textArea = createTextArea(MarkdownUtil.markdownToHtml(textBeforeCode));
-                mainPanel.add(textArea);
+                String html = MarkdownUtil.markdownToHtml(textBeforeCode);
+                mainPanel.add(createTextArea(html));
             }
 
             // Add the code block with RSyntaxTextArea

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.seeyon.chat"
-version = "1.1"
+version = "1.2"
 
 repositories {
     mavenCentral()

@@ -2,7 +2,9 @@ package com.seeyon.chat.toolWindow.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.seeyon.chat.toolWindow.ChatToolWindowService;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentManager;
+import com.seeyon.chat.core.service.ChatService;
 import com.seeyon.chat.utils.NotificationUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,14 +15,22 @@ import javax.swing.*;
  */
 public class NewChatAction extends DumbAwareAction {
 
-    public NewChatAction(String text, Icon icon) {
+    private final ContentManager contentManager;
+    private final Content chatContent;
+
+    public NewChatAction(String text, Icon icon, ContentManager contentManager, Content chatContent) {
         super(() -> text, icon);
+        this.contentManager = contentManager;
+        this.chatContent = chatContent;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        if (!contentManager.isSelected(chatContent)) {
+            contentManager.setSelectedContent(chatContent);
+        }
         try {
-            ChatToolWindowService.getInstance().createNewChat();
+            ChatService.getInstance().createNewChat();
         } catch (Exception ex) {
             NotificationUtil.error(ex.getMessage());
         }

@@ -1,8 +1,7 @@
 package com.seeyon.chat.listener;
 
-import com.seeyon.chat.toolWindow.ChatToolWindowService;
+import com.seeyon.chat.core.service.ChatService;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,11 +12,6 @@ public class StopActonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ChatToolWindowService service = ChatToolWindowService.getInstance();
-        if (service.getFuture() != null) {
-            service.getFuture().cancel(true);
-        }
-        SwingUtilities.invokeLater(() -> service.getChatToolWindow().aroundSend(true));
-        service.unlock();
+        ChatService.getInstance().stopGenerating();
     }
 }
