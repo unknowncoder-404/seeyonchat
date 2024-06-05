@@ -52,9 +52,9 @@ public class RoundRectPanel extends JPanel {
         this.cornerRadius = cornerRadius;
     }
 
-    public void setBorderColor(Color borderColor) {
+    public void setBorderColor(Color borderColor, int thickness) {
         if (borderColor != null) {
-            this.roundLineBorder = new RoundLineBorder(borderColor, 2, this.cornerRadius);
+            this.roundLineBorder = new RoundLineBorder(borderColor, thickness, this.cornerRadius);
         } else {
             this.roundLineBorder = null;
         }

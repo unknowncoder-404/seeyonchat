@@ -5,8 +5,6 @@ import com.seeyon.chat.ui.ChatPanel;
 import com.seeyon.chat.ui.AskInputPanel;
 
 import javax.swing.*;
-import java.awt.*;
-
 
 /**
  * @author Shaozz
@@ -43,15 +41,15 @@ public class ChatToolWindowContent {
     public void aroundSend(boolean actionState) {
         if (actionState) {
             // after send
-            askInputPanel.remove(askInputPanel.getStopButton());
-            askInputPanel.add(askInputPanel.getSendButton(), BorderLayout.EAST);
+            askInputPanel.removeStopLabel();
+            askInputPanel.addSendLabel();
 
             chatPanel.removeScrollListener();
             chatPanel.removeLoader();
         } else {
             // before send
-            askInputPanel.add(askInputPanel.getStopButton(), BorderLayout.EAST);
-            askInputPanel.remove(askInputPanel.getSendButton());
+            askInputPanel.addStopLabel();
+            askInputPanel.removeSendLabel();
             askInputPanel.getTextArea().setText("");
 
             chatPanel.addScrollListener();
