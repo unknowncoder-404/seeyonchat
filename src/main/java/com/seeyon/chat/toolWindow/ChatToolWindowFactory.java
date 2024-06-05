@@ -30,7 +30,7 @@ public class ChatToolWindowFactory implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentManager contentManager = toolWindow.getContentManager();
 
-        ChatToolWindowContent chatToolWindowContent = ChatService.getInstance().getToolWindowContent();
+        ChatToolWindowContent chatToolWindowContent = ChatService.getInstance(project).getToolWindowContent();
         Content chatContent = ContentFactory.getInstance().createContent(chatToolWindowContent.getContentPanel(), "问答", false);
         contentManager.addContent(chatContent);
 

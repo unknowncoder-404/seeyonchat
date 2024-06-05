@@ -3,7 +3,6 @@ package com.seeyon.chat.listener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.seeyon.chat.core.service.ChatService;
-import com.seeyon.chat.settings.AppSettingsState;
 import com.seeyon.chat.toolWindow.ChatToolWindowFactory;
 import com.seeyon.chat.utils.NotificationUtil;
 
@@ -28,10 +27,9 @@ public class RecoverChatListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
-                AppSettingsState settingsState = AppSettingsState.getInstance();
-                if (!chatId.equals(settingsState.getChatId())) {
-                    settingsState.setChatId(chatId);
-                    ChatService.getInstance().recoverChat(chatId);
+                ChatService chatService = ChatService.getInstance(project);
+                if (!chatId.equals(chatService.getChatId())) {
+                    chatService.recoverChat(chatId);
                 }
                 ChatToolWindowFactory.getToolWindow(project).getContentManager().selectPreviousContent();
             } catch (Exception ex) {

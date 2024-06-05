@@ -6,7 +6,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import com.intellij.util.xmlb.annotations.Transient;
 import com.seeyon.chat.common.ChatConstants;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +21,7 @@ import java.util.Map;
         name = "com.seeyon.chat.settings.AppSettingsState",
         storages = @Storage("SeeyonChatSettingsPlugin.xml")
 )
-@Service
+@Service(Service.Level.APP)
 public final class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
 
     private String apiKey = "";
@@ -31,9 +30,6 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
 
     // key:model value:chatbotId
     public final Map<String, String> chatbotMap = new HashMap<>();
-
-    @Transient
-    private String chatId;
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
@@ -75,14 +71,5 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
 
     public void putChatbotId(String chatbotId) {
         chatbotMap.put(model, chatbotId);
-    }
-
-    @Transient
-    public String getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
     }
 }

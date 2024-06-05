@@ -1,5 +1,6 @@
 package com.seeyon.chat.toolWindow;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.OnePixelSplitter;
 import com.seeyon.chat.ui.ChatPanel;
 import com.seeyon.chat.ui.AskInputPanel;
@@ -17,9 +18,9 @@ public class ChatToolWindowContent {
 
     private final AskInputPanel askInputPanel;
 
-    public ChatToolWindowContent() {
+    public ChatToolWindowContent(Project project) {
         chatPanel = new ChatPanel();
-        askInputPanel = new AskInputPanel();
+        askInputPanel = new AskInputPanel(project);
         splitter = new OnePixelSplitter(true, 0.95f);
 
         splitter.setFirstComponent(chatPanel);

@@ -10,7 +10,6 @@ import com.intellij.util.ui.UIUtil;
 import com.seeyon.chat.core.model.Chat;
 import com.seeyon.chat.core.service.ChatService;
 import com.seeyon.chat.listener.RecoverChatListener;
-import com.seeyon.chat.settings.AppSettingsState;
 import com.seeyon.chat.ui.color.ChatColor;
 import com.seeyon.chat.utils.ChatHttpUtil;
 import com.seeyon.chat.utils.NotificationUtil;
@@ -76,8 +75,9 @@ public class ChatHistoryCell extends RoundRectPanel {
                     historiesPanel.removeChat(ChatHistoryCell.this);
 
                     // 如果删除的是当前对话，则新建对话
-                    if (chatId.equals(AppSettingsState.getInstance().getChatId())) {
-                        ChatService.getInstance().createNewChat();
+                    ChatService chatService = ChatService.getInstance(project);
+                    if (chatId.equals(chatService.getChatId())) {
+                        chatService.createNewChat();
                     }
                 } catch (Exception ex) {
                     NotificationUtil.error(ex.getMessage());
@@ -95,7 +95,7 @@ public class ChatHistoryCell extends RoundRectPanel {
         footerPanel.setOpaque(false);
         footerPanel.setLayout(new BorderLayout());
         footerPanel.add(modifiedLabel, BorderLayout.WEST);
-        if (chatId.equals(AppSettingsState.getInstance().getChatId())){
+        if (chatId.equals(ChatService.getInstance(project).getChatId())){
             footerPanel.add(new JLabel(AllIcons.General.InspectionsEye), BorderLayout.EAST);
         }
         this.add(footerPanel, BorderLayout.SOUTH);

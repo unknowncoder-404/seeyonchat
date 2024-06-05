@@ -1,7 +1,8 @@
 package com.seeyon.chat.core.service;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.Strings;
 import com.seeyon.chat.core.ChatMessageSubscriber;
 import com.seeyon.chat.core.model.Chat;
 import com.seeyon.chat.settings.AppSettingsState;
@@ -11,6 +12,7 @@ import com.seeyon.chat.ui.ChatCell;
 import com.seeyon.chat.utils.ChatHttpUtil;
 import com.seeyon.chat.utils.ChatSettingsUtil;
 import com.seeyon.chat.utils.NotificationUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -25,19 +27,25 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service(Service.Level.PROJECT)
 public final class ChatService {
 
+    private final Project project;
+
     private final ChatToolWindowContent chatToolWindowContent;
 
     private final AtomicBoolean lock;
 
+    private volatile String chatId;
+
     private CompletableFuture<HttpResponse<Void>> future;
 
-    public ChatService() {
-        this.chatToolWindowContent = new ChatToolWindowContent();
+    public ChatService(Project project) {
+        this.project = project;
+
+        this.chatToolWindowContent = new ChatToolWindowContent(project);
         this.lock = new AtomicBoolean();
     }
 
-    public static ChatService getInstance() {
-        return ApplicationManager.getApplication().getService(ChatService.class);
+    public static ChatService getInstance(@NotNull Project project) {
+        return project.getService(ChatService.class);
     }
 
     public ChatToolWindowContent getToolWindowContent() {
@@ -50,6 +58,10 @@ public final class ChatService {
 
     public void unlock() {
         lock.set(false);
+    }
+
+    public String getChatId() {
+        return chatId;
     }
 
     public void actionPerformed() {
@@ -78,10 +90,30 @@ public final class ChatService {
 
         // send message
         try {
-            future = ChatHttpUtil.sendMessage(ChatSettingsUtil.getChatId(), data, new ChatMessageSubscriber(chatPanel));
+            if (Strings.isEmpty(chatId)) {
+                chatId = createChat();
+            }
+            future = ChatHttpUtil.sendMessage(chatId, data, new ChatMessageSubscriber(chatPanel, project));
         } catch (Exception e) {
             stopGenerating();
             NotificationUtil.error(e.getMessage());
+        }
+    }
+
+    private String createChat() throws IOException, InterruptedException {
+        AppSettingsState settings = AppSettingsState.getInstance();
+        try {
+            return ChatHttpUtil.createChat(settings.getChatbotId());
+        } catch (RuntimeException e) {
+            if ("Chatbot not found.".equals(e.getMessage())) {
+                // create chatbot
+                String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+                settings.putChatbotId(chatbotId);
+
+                return ChatHttpUtil.createChat(chatbotId);
+            } else {
+                throw e;
+            }
         }
     }
 
@@ -104,8 +136,7 @@ public final class ChatService {
         chatToolWindowContent.getChatPanel().removeAllChats();
 
         // create new chatId
-        AppSettingsState settings = AppSettingsState.getInstance();
-        settings.setChatId(ChatHttpUtil.createChat(settings.getChatbotId()));
+        chatId = createChat();
     }
 
     public void recoverChat(String chatId) throws IOException, InterruptedException {
@@ -118,5 +149,7 @@ public final class ChatService {
             }
         }).toList();
         chatToolWindowContent.getChatPanel().replaceAllChats(chatCells);
+
+        this.chatId = chatId;
     }
 }

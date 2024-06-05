@@ -1,6 +1,7 @@
 package com.seeyon.chat.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.intellij.openapi.project.Project;
 import com.seeyon.chat.common.ChatConstants;
 import com.seeyon.chat.core.service.ChatService;
 import com.seeyon.chat.ui.ChatPanel;
@@ -23,11 +24,15 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
 
     private final ChatPanel chatPanel;
 
+    private final Project project;
+
     private final ChatCell answer;
 
-    public ChatMessageSubscriber(ChatPanel chatPanel) {
+    public ChatMessageSubscriber(ChatPanel chatPanel, Project project) {
         this.chatPanel = chatPanel;
-        answer = ChatCell.ofAnswer();
+        this.project = project;
+
+        this.answer = ChatCell.ofAnswer();
     }
 
     @Override
@@ -75,12 +80,12 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
         if (throwable instanceof IOException) {
             return;
         }
-        ChatService.getInstance().stopGenerating();
+        ChatService.getInstance(project).stopGenerating();
         SwingUtilities.invokeLater(() -> NotificationUtil.error(throwable.getMessage()));
     }
 
     @Override
     public void onComplete() {
-        ChatService.getInstance().stopGenerating();
+        ChatService.getInstance(project).stopGenerating();
     }
 }

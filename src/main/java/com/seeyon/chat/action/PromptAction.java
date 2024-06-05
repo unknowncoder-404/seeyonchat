@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.seeyon.chat.core.service.ChatService;
 import com.seeyon.chat.toolWindow.ChatToolWindowFactory;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,8 @@ public class PromptAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ChatToolWindowFactory.showToolWindow(e.getProject());
+        Project project = e.getProject();
+        ChatToolWindowFactory.showToolWindow(project);
         Editor editor = e.getData(CommonDataKeys.EDITOR);
         assert editor != null;
         String selectedText = editor.getSelectionModel().getSelectedText();
@@ -30,11 +32,11 @@ public class PromptAction extends AnAction {
 
         String questionContent = "<p>" +prompt + "</p>\n" + "<pre><code>" + selectedText + "</code></pre>";
 
-        ChatService.getInstance().actionPerformed(questionContent);
+        ChatService.getInstance(project).actionPerformed(questionContent);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!ChatService.getInstance().isLocked());
+        e.getPresentation().setEnabled(!ChatService.getInstance(e.getProject()).isLocked());
     }
 }

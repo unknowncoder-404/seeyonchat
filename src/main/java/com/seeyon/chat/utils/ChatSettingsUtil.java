@@ -25,27 +25,4 @@ public class ChatSettingsUtil {
         return true;
     }
 
-    public static String getChatId() throws Exception {
-        AppSettingsState settings = AppSettingsState.getInstance();
-        String chatId = settings.getChatId();
-        if (Strings.isEmpty(chatId)) {
-            try {
-                chatId = ChatHttpUtil.createChat(settings.getChatbotId());
-                settings.setChatId(chatId);
-            } catch (RuntimeException e) {
-                if ("Chatbot not found.".equals(e.getMessage())) {
-                    // create chatbot
-                    String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
-                    settings.putChatbotId(chatbotId);
-
-                    chatId = ChatHttpUtil.createChat(chatbotId);
-                    settings.setChatId(chatId);
-                } else {
-                    throw e;
-                }
-            }
-        }
-        return chatId;
-    }
-
 }

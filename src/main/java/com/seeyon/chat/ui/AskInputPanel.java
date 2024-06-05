@@ -1,6 +1,7 @@
 package com.seeyon.chat.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -29,7 +30,7 @@ public class AskInputPanel extends JPanel {
 
     private final JLabel stopLabel;
 
-    public AskInputPanel() {
+    public AskInputPanel(Project project) {
         setLayout(new BorderLayout());
         setBorder(JBUI.Borders.empty(10));
 
@@ -45,7 +46,7 @@ public class AskInputPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isControlDown() && !e.isShiftDown()) {
-                    ChatService.getInstance().actionPerformed();
+                    ChatService.getInstance(project).actionPerformed();
                 }
             }
         });
@@ -56,7 +57,7 @@ public class AskInputPanel extends JPanel {
         sendLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ChatService.getInstance().actionPerformed();
+                ChatService.getInstance(project).actionPerformed();
             }
         });
         mainPanel.add(sendLabel, BorderLayout.EAST);
@@ -67,7 +68,7 @@ public class AskInputPanel extends JPanel {
         stopLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ChatService.getInstance().stopGenerating();
+                ChatService.getInstance(project).stopGenerating();
             }
         });
     }

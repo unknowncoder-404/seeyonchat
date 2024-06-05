@@ -30,7 +30,7 @@ public class NewChatAction extends DumbAwareAction {
             contentManager.setSelectedContent(chatContent);
         }
         try {
-            ChatService.getInstance().createNewChat();
+            ChatService.getInstance(e.getProject()).createNewChat();
         } catch (Exception ex) {
             NotificationUtil.error(ex.getMessage());
         }
