@@ -30,9 +30,9 @@ public class PromptAction extends AnAction {
 
         String prompt = e.getPresentation().getText();
 
-        String questionContent = "<p>" +prompt + "</p>\n" + "<pre><code>" + selectedText + "</code></pre>";
+        String questionContent = prompt + "\n```\n" + selectedText + "\n```";
 
-        ChatService.getInstance(project).actionPerformed(questionContent);
+        ChatService.getInstance(project).sendMessage(questionContent);
     }
 
     @Override

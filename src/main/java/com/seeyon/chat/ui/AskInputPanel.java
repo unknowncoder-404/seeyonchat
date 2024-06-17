@@ -46,7 +46,7 @@ public class AskInputPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isControlDown() && !e.isShiftDown()) {
-                    ChatService.getInstance(project).actionPerformed();
+                    ChatService.getInstance(project).sendMessage();
                 }
             }
         });
@@ -57,7 +57,7 @@ public class AskInputPanel extends JPanel {
         sendLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ChatService.getInstance(project).actionPerformed();
+                ChatService.getInstance(project).sendMessage();
             }
         });
         mainPanel.add(sendLabel, BorderLayout.EAST);

@@ -20,7 +20,7 @@ public class ChatConstants {
 //    public static final String IDE_NAME = ApplicationInfo.getInstance().getVersionName();
 
     static {
-        MODEL_MAP.put("GPT-3.5-Turbo", "gpt-3.5-turbo");
+        MODEL_MAP.put("GPT-3.5 Turbo", "gpt-3.5-turbo");
         MODEL_MAP.put("GPT-4", "gpt-4");
         MODEL_MAP.put("GPT-4V", "gpt-4v");
         MODEL_MAP.put("通义千问", "qwen");

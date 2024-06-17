@@ -78,6 +78,6 @@ public class MarkdownComponent {
     }
 
     static {
-        pattern = Pattern.compile("```(\\w+)?\\n([\\s\\S]*?)\\n```");
+        pattern = Pattern.compile("```(\\w+)?\\n(.*?)\\n\\s*```", Pattern.DOTALL);
     }
 }

@@ -26,6 +26,8 @@ import java.util.Locale;
  */
 public class ChatHistoryCell extends RoundRectPanel {
 
+    private static final Font FONT = new Font("Monospaced", Font.PLAIN, 11);
+
     private final JLabel titleLabel;
 
     private final JLabel modifiedLabel;
@@ -53,7 +55,7 @@ public class ChatHistoryCell extends RoundRectPanel {
 
         modifiedLabel = new JLabel(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(chat.getUpdatedAt()));
         modifiedLabel.setForeground(JBColor.GRAY);
-        modifiedLabel.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        modifiedLabel.setFont(FONT);
 
         deleteLabel = new JLabel(AllIcons.Actions.DeleteTag);
         deleteLabel.setVerticalAlignment(1);
@@ -110,10 +112,7 @@ public class ChatHistoryCell extends RoundRectPanel {
         }
         str = StringUtil.escapeXmlEntities(str);
         str = str.replace(" ", "&nbsp;");
-        str = str.replace("\t", "&nbsp;&nbsp;");
-        str = str.replace("\r\n", "<br/>");
-        str = str.replace("\n", "<br/>");
-        return "<html><body>" + str + "</body></html>";
+        return str;
     }
 
     private static String keepLength(String str, int maxLength) {

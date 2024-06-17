@@ -5,6 +5,7 @@ import com.intellij.util.ui.JBUI;
 import com.seeyon.chat.ui.color.ChatColor;
 import com.seeyon.chat.ui.markdown.MarkdownComponent;
 import com.seeyon.chat.ui.markdown.MarkdownStreamComponent;
+import com.seeyon.chat.utils.MarkdownUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,7 @@ public class ChatCell extends RoundRectPanel {
                 return "";
             }
         };
-        htmlPanel.setText(text);
+        htmlPanel.setText(MarkdownUtil.markdownToHtml(text));
         chatCell.add(htmlPanel, BorderLayout.CENTER);
         return chatCell;
     }

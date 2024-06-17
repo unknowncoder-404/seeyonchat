@@ -3,14 +3,15 @@ package com.seeyon.chat.utils;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 
 /**
  * @author Shaozz
  */
 public class MarkdownUtil {
 
-    private static final Parser parser = Parser.builder().build();
-    private static final HtmlRenderer renderer = HtmlRenderer.builder().build();
+    private static final Parser parser;
+    private static final HtmlRenderer renderer;
 
     /**
      * 将Markdown文本转换为HTML。
@@ -23,6 +24,14 @@ public class MarkdownUtil {
         Node document = parser.parse(markdownText);
         // 将解析后的文档渲染为HTML
         return renderer.render(document);
+    }
+
+    static {
+        MutableDataSet options = new MutableDataSet();
+        options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+        options.set(HtmlRenderer.ESCAPE_HTML, true);
+        parser = Parser.builder(options).build();
+        renderer = HtmlRenderer.builder(options).build();
     }
 
 }

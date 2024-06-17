@@ -1,6 +1,7 @@
 package com.seeyon.chat.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ui.JBColor;
 import com.seeyon.chat.ui.markdown.MarkdownComponent;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -43,11 +44,12 @@ public class CodePanel extends JPanel {
         add(createHeaderPanel(code, language), BorderLayout.NORTH);
     }
 
-    private JPanel createHeaderPanel(String code, String language) {
+    private static JPanel createHeaderPanel(String code, String language) {
         // Create the header panel with language label and copy button
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         JLabel languageLabel = new JLabel(language != null ? language : "text");
+        languageLabel.setForeground(JBColor.GRAY);
         JLabel copyLabel = new JLabel(AllIcons.Actions.Copy);
         copyLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         copyLabel.addMouseListener(new MouseAdapter() {

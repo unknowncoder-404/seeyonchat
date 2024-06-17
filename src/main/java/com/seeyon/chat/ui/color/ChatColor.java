@@ -9,6 +9,6 @@ import java.awt.*;
  */
 public class ChatColor {
 
-    public static final Color NORMAL_BG_COLOR = new JBColor(new Color(14671839), new Color(-11644332));
+    public static final JBColor NORMAL_BG_COLOR = new JBColor(new Color(14671839), new Color(-11644332));
     public static final JBColor ANSWER_BG_COLOR = new JBColor(new Color(16777215), new Color(0x343639));
 }

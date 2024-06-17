@@ -37,12 +37,11 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
+        this.subscription = subscription;
         SwingUtilities.invokeLater(() -> {
             chatPanel.removeLoader();
             chatPanel.addChat(answer);
         });
-
-        this.subscription = subscription;
         subscription.request(1);
     }
 

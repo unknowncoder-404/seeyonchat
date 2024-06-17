@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.SelectionModel;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,8 +30,8 @@ public class CustomDefaultActionGroup extends DefaultActionGroup {
         // Enable/disable depending on whether user is editing
         Editor editor = event.getData(CommonDataKeys.EDITOR);
         assert editor != null;
-        boolean hasSelection = editor.getSelectionModel().hasSelection();
-        event.getPresentation().setEnabledAndVisible(hasSelection);
+        SelectionModel selectionModel = editor.getSelectionModel();
+        event.getPresentation().setEnabledAndVisible(selectionModel.hasSelection() && !selectionModel.getSelectedText().isBlank());
     }
 
 }
