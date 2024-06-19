@@ -42,7 +42,7 @@
                 id="致慧泉"
                 secondary="true"
                 anchor="right"
-                icon="/icons/toolWindow.png"/>
+                icon="/META-INF/pluginIcon.svg"/>
         <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>
     </extensions>
 
@@ -50,7 +50,7 @@
         <group id="CustomDefaultActionGroup"
                class="com.seeyon.chat.action.CustomDefaultActionGroup"
                text="致慧泉"
-               icon="/icons/action.png"
+               icon="/META-INF/pluginIcon.svg"
                popup="true">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <action id="PromptAction1"
