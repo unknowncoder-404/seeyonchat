@@ -46,6 +46,7 @@ public class AskInputPanel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isControlDown() && !e.isShiftDown()) {
+                    e.consume();
                     ChatService.getInstance(project).sendMessage();
                 }
             }

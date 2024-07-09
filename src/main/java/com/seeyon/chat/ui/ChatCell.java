@@ -41,18 +41,18 @@ public class ChatCell extends RoundRectPanel {
         return chatCell;
     }
 
-    public static ChatCell ofAnswer() {
-        ChatCell chatCell = new ChatCell(false);
-        chatCell.markdownStreamComponent = new MarkdownStreamComponent();
-        chatCell.add(chatCell.markdownStreamComponent.getComponent(), BorderLayout.CENTER);
-        return chatCell;
-    }
-
     public static ChatCell ofAnswer(String text) {
         ChatCell chatCell = new ChatCell(false);
         MarkdownComponent markdownComponent = new MarkdownComponent();
         markdownComponent.updateContent(text);
         chatCell.add(markdownComponent.getComponent(), BorderLayout.CENTER);
+        return chatCell;
+    }
+
+    public static ChatCell ofAnswer() {
+        ChatCell chatCell = new ChatCell(false);
+        chatCell.markdownStreamComponent = new MarkdownStreamComponent();
+        chatCell.add(chatCell.markdownStreamComponent.getComponent(), BorderLayout.CENTER);
         return chatCell;
     }
 
