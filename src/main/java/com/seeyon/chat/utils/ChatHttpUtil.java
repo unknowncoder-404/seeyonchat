@@ -94,6 +94,28 @@ public class ChatHttpUtil {
         return client.sendAsync(request, HttpResponse.BodyHandlers.fromSubscriber(subscriber));
     }
 
+//    public static String sendMessageSync( String content,String chatId) throws IOException, InterruptedException {
+//
+//        Map<String, String> map = new HashMap<>();
+//        map.put("role", "user");
+//        map.put("content", content);
+//        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
+//
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(URI.create(ChatConstants.BASE_URL+"/chats/"+chatId+ "/messages?stream=off"))
+//                .headers(buildHeaders())
+//                .header("Accept", "text/event-stream")
+////                .header("Accept","application/json")
+//                .POST(HttpRequest.BodyPublishers.ofString(body))
+//                .timeout(Duration.ofSeconds(30))
+//                .build();
+//        HttpResponse<String> send = client.send(request, HttpResponse.BodyHandlers.ofString());
+//
+//        return send.body();
+//    }
+
+
+
     private static String[] buildHeaders() {
         return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
     }

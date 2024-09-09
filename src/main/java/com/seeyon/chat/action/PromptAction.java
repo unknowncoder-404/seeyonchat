@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.seeyon.chat.core.service.ChatService;
@@ -27,6 +28,10 @@ public class PromptAction extends AnAction {
         Editor editor = e.getData(CommonDataKeys.EDITOR);
         assert editor != null;
         String selectedText = editor.getSelectionModel().getSelectedText();
+        if (selectedText == null || selectedText.isEmpty()) {
+            Document document = editor.getDocument();
+            selectedText = document.getText();
+        }
 
         String prompt = e.getPresentation().getText();
 

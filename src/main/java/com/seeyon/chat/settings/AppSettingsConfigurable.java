@@ -5,6 +5,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.text.Strings;
+import com.seeyon.chat.common.ChatConstants;
 import com.seeyon.chat.utils.ChatHttpUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,14 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         AppSettingsState settings = AppSettingsState.getInstance();
-        return !appSettingsComponent.getApiKeyText().equals(settings.getApiKey()) ||
+        return !appSettingsComponent.getApiKeyTextFieldText().equals(settings.getGptApiKey()) ||
+                !appSettingsComponent.getApiVersionTextFieldText().equals(settings.getGptApiVersion()) ||
+                !appSettingsComponent.getUriTextFieldText().equals(settings.getGptUri()) ||
+                !appSettingsComponent.getModelTextFieldText().equals(settings.getGptModel()) ||
+                !appSettingsComponent.getSplitCodePromptText().equals(settings.getApiKey()) ||
+                !appSettingsComponent.getCodeMergePromptText().equals(settings.getApiKey()) ||
+                !appSettingsComponent.getJavaCodepromptText().equals(settings.getApiKey()) ||
+                !appSettingsComponent.getApiKeyText().equals(settings.getApiKey()) ||
                 !appSettingsComponent.getModelSelectedItem().equals(settings.getModel());
     }
 
@@ -47,6 +55,14 @@ public class AppSettingsConfigurable implements Configurable {
         AppSettingsState settings = AppSettingsState.getInstance();
         settings.setApiKey(appSettingsComponent.getApiKeyText());
         settings.setModel(appSettingsComponent.getModelSelectedItem());
+        settings.setGptApiKey(appSettingsComponent.getApiKeyTextFieldText());
+        settings.setGptApiVersion(appSettingsComponent.getApiVersionTextFieldText());
+        settings.setGptModel(appSettingsComponent.getModelTextFieldText());
+        settings.setGptUri(appSettingsComponent.getUriTextFieldText());
+        settings.setGptSplitCodePrompt(appSettingsComponent.getSplitCodePromptText());
+        settings.setGptCodeMergePrompt(appSettingsComponent.getCodeMergePromptText());
+        settings.setGptJavaCodeprompt(appSettingsComponent.getJavaCodepromptText());
+
         if (Strings.isNotEmpty(settings.getApiKey()) && Strings.isEmpty(settings.getChatbotId())) {
             try {
                 // create chatbot
@@ -64,8 +80,20 @@ public class AppSettingsConfigurable implements Configurable {
         AppSettingsState settings = AppSettingsState.getInstance();
         appSettingsComponent.setApiKeyText(settings.getApiKey());
         appSettingsComponent.setModelSelectedItem(settings.getModel());
-    }
 
+        //TODO: gptApiKey需要打包前去掉
+        appSettingsComponent.setApiKeyTextFieldText(settings.getGptApiKey());
+        appSettingsComponent.setApiVersionTextFieldText(settings.getGptApiVersion());
+        appSettingsComponent.setModelTextFieldText(settings.getGptModel());
+        appSettingsComponent.setUriTextFieldText(settings.getGptUri());
+        appSettingsComponent.setSplitCodePromptText(settings.getGptSplitCodePrompt());
+        appSettingsComponent.setCodeMergePromptText(settings.getGptCodeMergePrompt());
+        appSettingsComponent.setJavaCodepromptText(settings.getGptJavaCodeprompt());
+    }
+//    public static String sendMessageUriTemplate = "{uri}/deployments/{model}/chat/completions?api-version={apiVersion}";
+//    public static String uri = "https://seeyonai.openai.azure.com/openai";
+//    public static String model = "GPT-4-Preview";
+//    public static String apiVersion = "2024-06-01";
     @Override
     public void disposeUIResources() {
         appSettingsComponent = null;

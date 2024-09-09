@@ -27,6 +27,7 @@
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
     <!--    <depends>org.intellij.plugins.markdown</depends>-->
 
     <!-- Extension points defined by the plugin.
@@ -44,9 +45,13 @@
                 anchor="right"
                 icon="/META-INF/pluginIcon.svg"/>
         <notificationGroup displayType="BALLOON" id="Custom Notification Group"/>
+
     </extensions>
 
     <actions>
+        <action id="GenerateUnitTestAction" class="com.seeyon.chat.action.GenerateUnitTestAction" text="生成单元测试文件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
         <group id="CustomDefaultActionGroup"
                class="com.seeyon.chat.action.CustomDefaultActionGroup"
                text="致慧泉"
