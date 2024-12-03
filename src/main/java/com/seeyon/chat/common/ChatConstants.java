@@ -21,11 +21,8 @@ public class ChatConstants {
 
     static {
         MODEL_MAP.put("GPT-3.5 Turbo", "gpt-3.5-turbo");
-        MODEL_MAP.put("GPT-4", "gpt-4");
         MODEL_MAP.put("GPT-4V", "gpt-4v");
-        MODEL_MAP.put("通义千问", "qwen");
-        MODEL_MAP.put("文心一言", "wenxin");
-        MODEL_MAP.put("ChatGLM", "chatglm");
+        MODEL_MAP.put("GPT-4o mini", "gpt-4o-mini");
         MODEL_MAP.put("Llama 3 70B", "tai-meta-llama/Llama-3-8b-chat-hf");
 
         // 配置ObjectMapper在反序列化时忽略未知属性

@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
-import java.util.function.Supplier;
-
 /**
  * @author Shaozz
  */
@@ -20,17 +18,17 @@ public class ChatBundle {
     public static @NotNull
     @Nls String message(
             @NotNull @PropertyKey(resourceBundle = BUNDLE) String key,
-            Object @NotNull ... params
+            Object... params
     ) {
         return INSTANCE.getMessage(key, params);
     }
 
-    public static Supplier<@Nls String> lazyMessage(
-            @NotNull @PropertyKey(resourceBundle = BUNDLE) String key,
-            Object @NotNull ... params
-    ) {
-        return INSTANCE.getLazyMessage(key, params);
-    }
+//    public static Supplier<@Nls String> lazyMessage(
+//            @NotNull @PropertyKey(resourceBundle = BUNDLE) String key,
+//            Object @NotNull ... params
+//    ) {
+//        return INSTANCE.getLazyMessage(key, params);
+//    }
 
 
 }

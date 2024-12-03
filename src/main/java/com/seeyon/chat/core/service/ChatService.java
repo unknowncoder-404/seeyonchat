@@ -102,12 +102,17 @@ public final class ChatService {
 
     private String createChat() throws IOException, InterruptedException {
         AppSettingsState settings = AppSettingsState.getInstance();
+        String chatbotId = settings.getChatbotId();
+        if (Strings.isEmpty(chatbotId)) {
+            chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+            settings.putChatbotId(chatbotId);
+        }
         try {
-            return ChatHttpUtil.createChat(settings.getChatbotId());
+            return ChatHttpUtil.createChat(chatbotId);
         } catch (RuntimeException e) {
             if ("Chatbot not found.".equals(e.getMessage())) {
                 // create chatbot
-                String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+                chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
                 settings.putChatbotId(chatbotId);
 
                 return ChatHttpUtil.createChat(chatbotId);

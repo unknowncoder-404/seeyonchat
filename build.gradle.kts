@@ -1,36 +1,41 @@
 plugins {
-    id("java")
-    id("org.jetbrains.intellij") version "1.17.3"
+    id("org.jetbrains.intellij.platform") version "2.1.0"
 }
-
-group = "com.seeyon.chat"
-version = "1.2"
 
 repositories {
     mavenCentral()
-}
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    // Repositories Extension
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/com.vladsch.flexmark/flexmark
     implementation("com.vladsch.flexmark:flexmark:0.64.8")
 
-//    implementation(fileTree("libs"))
-
     // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
     implementation("com.fifesoft:rsyntaxtextarea:3.4.0")
-}
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2024.1.1")
-    type.set("IC") // Target IDE Platform
 
-    // https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
-//    plugins.set(listOf("org.intellij.plugins.markdown"))
+    // Dependencies Extension
+    intellijPlatform {
+        intellijIdeaCommunity("2022.3")
+
+        javaCompiler()
+    }
+}
+
+// IntelliJ Platform Extension
+intellijPlatform {
+
+    pluginConfiguration {
+        version = "1.3"
+        ideaVersion {
+            sinceBuild = "223"
+            untilBuild = provider { null }
+        }
+    }
 }
 
 tasks {
@@ -41,11 +46,6 @@ tasks {
 
     buildSearchableOptions {
         enabled = false
-    }
-
-    patchPluginXml {
-        sinceBuild.set("223")
-        untilBuild.set("242.*")
     }
 
     signPlugin {

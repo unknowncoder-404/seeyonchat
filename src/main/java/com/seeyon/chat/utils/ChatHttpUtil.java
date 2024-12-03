@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.seeyon.chat.core.model.Chat;
 import com.seeyon.chat.settings.AppSettingsState;
 import com.seeyon.chat.common.ChatConstants;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +33,7 @@ public class ChatHttpUtil {
             .executor(Executors.newSingleThreadExecutor())
             .build();
 
-    public static String createChatbot(String model) throws IOException, InterruptedException {
+    public static String createChatbot(@NotNull String model) throws IOException, InterruptedException {
         Map<String, String> map = new HashMap<>();
         map.put("model", model);
         map.put("name", ChatBundle.message("chatbot.name", model));
@@ -58,7 +59,7 @@ public class ChatHttpUtil {
         }
     }
 
-    public static String createChat(String chatbotId) throws IOException, InterruptedException {
+    public static String createChat(@NotNull String chatbotId) throws IOException, InterruptedException {
         Map<String, String> map = Collections.singletonMap("chatbotId", chatbotId);
         String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
 
@@ -78,7 +79,7 @@ public class ChatHttpUtil {
         return (String) id;
     }
 
-    public static CompletableFuture<HttpResponse<Void>> sendMessage(String chatId, String content, Flow.Subscriber<? super List<ByteBuffer>> subscriber) throws JsonProcessingException {
+    public static CompletableFuture<HttpResponse<Void>> sendMessage(@NotNull String chatId, String content, Flow.Subscriber<? super List<ByteBuffer>> subscriber) throws JsonProcessingException {
         Map<String, String> map = new HashMap<>();
         map.put("role", "user");
         map.put("content", content);
@@ -98,7 +99,7 @@ public class ChatHttpUtil {
         return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
     }
 
-    public static List<Chat> getChats(String chatbotId) throws IOException, InterruptedException {
+    public static List<Chat> getChats(@NotNull String chatbotId) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats"))
                 .headers(buildHeaders())
@@ -112,7 +113,7 @@ public class ChatHttpUtil {
         return chats.stream().filter(chat -> chatbotId.equals(chat.getChatbotId())).toList();
     }
 
-    public static Chat getChat(String chatId) throws IOException, InterruptedException {
+    public static Chat getChat(@NotNull String chatId) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId))
                 .headers(buildHeaders())
@@ -132,7 +133,7 @@ public class ChatHttpUtil {
         }
     }
 
-    public static void deleteChat(String chatId) throws IOException, InterruptedException {
+    public static void deleteChat(@NotNull String chatId) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId))
                 .headers(buildHeaders())

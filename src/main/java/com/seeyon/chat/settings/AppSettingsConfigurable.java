@@ -2,7 +2,6 @@ package com.seeyon.chat.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.text.Strings;
 import com.seeyon.chat.utils.ChatHttpUtil;
@@ -38,8 +37,10 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         AppSettingsState settings = AppSettingsState.getInstance();
-        return !appSettingsComponent.getApiKeyText().equals(settings.getApiKey()) ||
-                !appSettingsComponent.getModelSelectedItem().equals(settings.getModel());
+        String apiKeyText = appSettingsComponent.getApiKeyText();
+        return Strings.isNotEmpty(apiKeyText) &&
+                (!apiKeyText.equals(settings.getApiKey()) ||
+                        !appSettingsComponent.getModelSelectedItem().equals(settings.getModel()));
     }
 
     @Override
@@ -52,9 +53,7 @@ public class AppSettingsConfigurable implements Configurable {
                 // create chatbot
                 String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
                 settings.putChatbotId(chatbotId);
-            } catch (Exception e) {
-                // 弹窗
-                Messages.showErrorDialog(e.getMessage(), "Error");
+            } catch (Exception ignored) {
             }
         }
     }

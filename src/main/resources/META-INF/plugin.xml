@@ -17,17 +17,48 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-        基于<a href="https://seeyon.chat">致慧泉</a>制作的AI聊天插件<br>
-        使用步骤：<br>
+        基于致慧泉开发的AI聊天插件
+        <br/>
+        <br/>
+        <b>使用步骤</b>
         <ol>
-        <li><em>登录<a href="https://seeyon.chat">致慧泉</a>，将<a href="https://seeyon.chat/account/api">API访问</a>中的API密钥复制粘贴到插件设置中，即可使用</a></em></li>
+        <li>登录<a href="https://seeyon.chat">致慧泉</a></li>
+        <li>打开<a href="https://seeyon.chat/account/api">API访问</a>页面，复制API密钥，粘贴到API key中</li>
+        <li>点击OK</li>
         </ol>
       ]]></description>
+
+    <change-notes><![CDATA[
+        <b>1.3</b>
+        <ul>
+        <li>兼容2024.2+版本</li>
+        <li>新图标</li>
+        <li>改bug</li>
+        </ul>
+        <b>1.2</b>
+        <ul>
+        <li>新增支持查看、删除和跳转历史会话</li>
+        <li>美化代码块显示：标注了语言类型、提供了复制按钮</li>
+        <li>UI更新（非我所长）</li>
+        <li>添加了一些可用的AI模型</li>
+        <li>修复了一些大大小小的bug</li>
+        </ul>
+        <b>1.1</b>
+        <ul>
+        <li>代码块突出显示、语法高亮</li>
+        <li>一些小的调整</li>
+        </ul>
+        <b>1.0</b>
+        <ul>
+        <li>发布</li>
+        <li>新增支持可选多个AI模型</li>
+        <li>新增开启新会话按钮</li>
+        </ul>
+    ]]></change-notes>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
-    <!--    <depends>org.intellij.plugins.markdown</depends>-->
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
