@@ -10,10 +10,7 @@ import com.seeyon.chat.utils.ChatBundle;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 /**
  * 搜索框
@@ -42,12 +39,16 @@ public class AskInputPanel extends JPanel {
         textArea = new JBTextArea();
         textArea.setLineWrap(true);// 自动换行
         textArea.setOpaque(false);
-        textArea.addKeyListener(new KeyAdapter() {
+        InputMap inputMap = textArea.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = textArea.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke("shift ENTER"), "insert-break");// 为 Shift + Enter 绑定换行操作
+        inputMap.put(KeyStroke.getKeyStroke("ENTER"), "submitText");// 为 Enter 绑定提交操作
+        actionMap.put("submitText", new AbstractAction() {
             @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && !e.isControlDown() && !e.isShiftDown()) {
-                    e.consume();
-                    ChatService.getInstance(project).sendMessage();
+            public void actionPerformed(ActionEvent e) {
+                String text = textArea.getText();
+                if (!text.isBlank()) {
+                    ChatService.getInstance(project).sendMessage(text);
                 }
             }
         });
@@ -58,7 +59,10 @@ public class AskInputPanel extends JPanel {
         sendLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ChatService.getInstance(project).sendMessage();
+                String text = textArea.getText();
+                if (!text.isBlank()) {
+                    ChatService.getInstance(project).sendMessage(text);
+                }
             }
         });
         mainPanel.add(sendLabel, BorderLayout.EAST);

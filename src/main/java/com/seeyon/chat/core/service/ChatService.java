@@ -64,11 +64,6 @@ public final class ChatService {
         return chatId;
     }
 
-    public void sendMessage() {
-        String text = chatToolWindowContent.getSearchBoxComponent().getTextArea().getText();
-        sendMessage(text);
-    }
-
     public void sendMessage(String data) {
         if (data.isEmpty()) {
             return;
