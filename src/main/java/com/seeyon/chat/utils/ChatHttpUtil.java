@@ -16,6 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -36,7 +37,7 @@ public class ChatHttpUtil {
         return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
     }
 
-    public static String createChatbot(@NotNull String model) throws IOException, InterruptedException {
+    public static String createChatbot(String model) throws IOException, InterruptedException {
         ObjectNode bodyJson = ChatConstants.OBJECT_MAPPER.createObjectNode();
         bodyJson.put("model", model);
         bodyJson.put("name", ChatBundle.message("chatbot.name", model));
@@ -52,13 +53,12 @@ public class ChatHttpUtil {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        JsonNode jsonNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
-        String message = jsonNode.get("message").asText();
-        if ("Chatbot created successfully.".equals(message)) {
-            return jsonNode.get("data").get("id").asText();
-        } else {
-            throw new RuntimeException(message);
+        JsonNode rootNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
+        JsonNode node = rootNode.path("data").path("_id");
+        if (node.isMissingNode()) {
+            throw new RuntimeException(rootNode.get("message").asText());
         }
+        return node.asText();
     }
 
     public static String createChat(@NotNull String chatbotId) throws IOException, InterruptedException {
@@ -97,7 +97,10 @@ public class ChatHttpUtil {
         return client.sendAsync(request, HttpResponse.BodyHandlers.fromSubscriber(subscriber));
     }
 
-    public static List<Chat> getChats(@NotNull String chatbotId) throws IOException, InterruptedException {
+    public static List<Chat> getChats(String chatbotId) throws IOException, InterruptedException {
+        if (chatbotId == null || chatbotId.isEmpty()) {
+            return Collections.emptyList();
+        }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats"))
                 .headers(buildHeaders())
@@ -148,6 +151,16 @@ public class ChatHttpUtil {
                 .timeout(Duration.ofSeconds(10))
                 .build();
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static void trimMessages(@NotNull String chatId, String body) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId + "/trimMessages"))
+                .headers(buildHeaders())
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .timeout(Duration.ofSeconds(10))
+                .build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     public static void deleteChat(@NotNull String chatId) throws IOException, InterruptedException {

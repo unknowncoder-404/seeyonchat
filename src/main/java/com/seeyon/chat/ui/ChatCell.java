@@ -16,16 +16,19 @@ import java.awt.*;
  */
 public class ChatCell extends RoundRectPanel {
 
+    private final boolean isAsk;
+
     private MarkdownStreamComponent markdownStreamComponent;
 
-    private ChatCell(boolean isSelf) {
+    private ChatCell(boolean isAsk) {
         setLayout(new BorderLayout());
         setBorder(JBUI.Borders.empty(10));
-        if (isSelf) {
+        if (isAsk) {
             setBackground(ChatColor.NORMAL_BG_COLOR);
         } else {
             setBackground(ChatColor.ANSWER_BG_COLOR);
         }
+        this.isAsk = isAsk;
     }
 
     public static ChatCell ofAsk(String text) {
@@ -60,4 +63,7 @@ public class ChatCell extends RoundRectPanel {
         markdownStreamComponent.append(text);
     }
 
+    public boolean isAsk() {
+        return isAsk;
+    }
 }

@@ -19,7 +19,7 @@ public class ChatToolWindowContent {
     private final AskInputPanel askInputPanel;
 
     public ChatToolWindowContent(Project project) {
-        chatPanel = new ChatPanel();
+        chatPanel = new ChatPanel(project);
         askInputPanel = new AskInputPanel(project);
         splitter = new OnePixelSplitter(true, 0.95f);
 
@@ -46,7 +46,8 @@ public class ChatToolWindowContent {
             askInputPanel.addSendLabel();
 
             chatPanel.removeScrollListener();
-            chatPanel.removeLoader();
+            chatPanel.removeLoadingLabel();
+            chatPanel.addRegenerateLabel();
         } else {
             // before send
             askInputPanel.addStopLabel();
@@ -54,12 +55,14 @@ public class ChatToolWindowContent {
             askInputPanel.getTextArea().setText("");
 
             chatPanel.addScrollListener();
-            chatPanel.addLoader();
+            chatPanel.addLoadingLabel();
+            chatPanel.removeRegenerateLabel();
         }
         askInputPanel.getTextArea().setEnabled(actionState);
 
         askInputPanel.revalidate();// 重新计算布局
         askInputPanel.repaint();// 刷新界面
+        chatPanel.repaintContent();
     }
 
 }

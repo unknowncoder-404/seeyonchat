@@ -47,6 +47,9 @@ public class ChatHistoryPanel extends JPanel {
     public void load(List<Chat> chats) {
         contentPanel.removeAll();
 
+        if (chats.isEmpty()) {
+            return;
+        }
         for (int i = 0; i < chats.size() && i < MAX_COUNT; i++) {
             contentPanel.add(new ChatHistoryCell(this, chats.get(i), project));
         }

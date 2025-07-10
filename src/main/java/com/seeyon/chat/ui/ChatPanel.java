@@ -1,9 +1,12 @@
 package com.seeyon.chat.ui;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnimatedIcon;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
+import com.seeyon.chat.core.service.ChatService;
 import com.seeyon.chat.ui.color.ChatColor;
 import com.seeyon.chat.utils.ChatBundle;
 
@@ -11,6 +14,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
@@ -22,9 +27,13 @@ public class ChatPanel extends JBScrollPane {
 
     private final MyAdjustmentListener scrollListener = new MyAdjustmentListener();
 
-    private final RoundRectPanel loaderPanel;
+    private final RoundRectPanel loadingPanel;
 
-    public ChatPanel() {
+    private final JPanel regeneratePanel;
+
+    private ChatCell latestChatCell;
+
+    public ChatPanel(Project project) {
         contentPanel = new JPanel(new VerticalLayout(JBUI.scale(10)));
         contentPanel.setBorder(JBUI.Borders.empty(10));
 
@@ -34,42 +43,79 @@ public class ChatPanel extends JBScrollPane {
         setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         getVerticalScrollBar().setAutoscrolls(true);
 
-        // Add loaderLabel
-        loaderPanel = new RoundRectPanel(new BorderLayout());
-        loaderPanel.setBorder(JBUI.Borders.empty(10));
-        loaderPanel.setBackground(ChatColor.ANSWER_BG_COLOR);
-        JLabel label = new JLabel(ChatBundle.message("ui.chat.loader"), new AnimatedIcon.Default(), SwingConstants.LEFT);
-        loaderPanel.add(label, BorderLayout.WEST);
+        // Add loading label
+        JLabel loadingLabel = new JLabel(ChatBundle.message("ui.chat.loading"), new AnimatedIcon.Default(), SwingConstants.LEFT);
+        loadingPanel = new RoundRectPanel(new BorderLayout());
+        loadingPanel.setBorder(JBUI.Borders.empty(10));
+        loadingPanel.setBackground(ChatColor.ANSWER_BG_COLOR);
+        loadingPanel.add(loadingLabel, BorderLayout.WEST);
+
+        // Add regenerate label
+        JLabel regenerateLabel = new JLabel(ChatBundle.message("ui.chat.regenerate"), AllIcons.Actions.Refresh, SwingConstants.LEFT);
+        regenerateLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        regenerateLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    ChatService.getInstance(project).regenerate();
+                } catch (Exception ex) {
+                }
+            }
+        });
+        regeneratePanel = new JPanel(new BorderLayout());
+        regeneratePanel.setOpaque(false);
+        regeneratePanel.add(regenerateLabel, BorderLayout.EAST);
     }
 
-    public void addChat(ChatCell cell) {
+    public void addChatCell(ChatCell cell) {
         contentPanel.add(cell);
-
-        contentPanel.revalidate();// 重新计算布局
-        contentPanel.repaint();// 刷新界面
+        latestChatCell = cell;
     }
 
-    public void removeAllChats() {
-        contentPanel.removeAll();
+    public ChatCell getLatestChatCell() {
+        return latestChatCell;
+    }
 
+    public void removeLatestChatCell() {
+        contentPanel.remove(latestChatCell);
+        latestChatCell = null;
+    }
+
+    public void removeChat() {
+        contentPanel.removeAll();
+        latestChatCell = null;
+
+        repaintContent();
+    }
+
+    public void replaceChat(List<ChatCell> chatCells) {
+        contentPanel.removeAll();
+        if (!chatCells.isEmpty()) {
+            chatCells.forEach(this::addChatCell);
+            addRegenerateLabel();
+        }
+        repaintContent();
+    }
+
+    public void repaintContent() {
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
-    public void replaceAllChats(List<ChatCell> chatCells) {
-        contentPanel.removeAll();
-        chatCells.forEach(contentPanel::add);
-
-        contentPanel.revalidate();
-        contentPanel.repaint();
+    public void addLoadingLabel() {
+        contentPanel.add(loadingPanel);
     }
 
-    public void addLoader() {
-        contentPanel.add(loaderPanel);
+    public void removeLoadingLabel() {
+        contentPanel.remove(loadingPanel);
     }
 
-    public void removeLoader() {
-        contentPanel.remove(loaderPanel);
+    public void addRegenerateLabel() {
+        contentPanel.add(regeneratePanel);
+    }
+
+    public void removeRegenerateLabel() {
+        contentPanel.remove(regeneratePanel);
     }
 
     public void addScrollListener() {

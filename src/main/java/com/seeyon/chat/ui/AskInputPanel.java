@@ -46,10 +46,7 @@ public class AskInputPanel extends JPanel {
         actionMap.put("submitText", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String text = textArea.getText();
-                if (!text.isBlank()) {
-                    ChatService.getInstance(project).sendMessage(text);
-                }
+                sendAction(project);
             }
         });
         mainPanel.add(textArea, BorderLayout.CENTER);
@@ -59,10 +56,7 @@ public class AskInputPanel extends JPanel {
         sendLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                String text = textArea.getText();
-                if (!text.isBlank()) {
-                    ChatService.getInstance(project).sendMessage(text);
-                }
+                sendAction(project);
             }
         });
         mainPanel.add(sendLabel, BorderLayout.EAST);
@@ -96,6 +90,13 @@ public class AskInputPanel extends JPanel {
 
     public void removeStopLabel() {
         mainPanel.remove(stopLabel);
+    }
+
+    private void sendAction(Project project) {
+        String text = textArea.getText();
+        if (!text.isBlank()) {
+            ChatService.getInstance(project).sendMessage(text);
+        }
     }
 
 }

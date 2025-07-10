@@ -65,13 +65,15 @@ public final class ChatService {
 
     public void sendMessage(String data) {
         // check
-        if (data.isEmpty() || !ChatSettingsUtil.checkSettings() || !lock.compareAndSet(false, true)) {
+        if (!ChatSettingsUtil.checkSettings() || !lock.compareAndSet(false, true)) {
             return;
         }
 
         // add the chat component to chatPanel
         ChatPanel chatPanel = chatToolWindowContent.getChatPanel();
-        chatPanel.addChat(ChatCell.ofAsk(data));
+        if (!data.isEmpty()) {
+            chatPanel.addChatCell(ChatCell.ofAsk(data));
+        }
 
         // before send
         chatToolWindowContent.aroundSend(false);
@@ -123,15 +125,11 @@ public final class ChatService {
         try {
             return ChatHttpUtil.createChat(chatbotId);
         } catch (RuntimeException e) {
-            if ("Chatbot not found.".equals(e.getMessage())) {
-                // create chatbot
-                chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
-                settings.putChatbotId(chatbotId);
+            // create chatbot
+            chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+            settings.putChatbotId(chatbotId);
 
-                return ChatHttpUtil.createChat(chatbotId);
-            } else {
-                throw e;
-            }
+            return ChatHttpUtil.createChat(chatbotId);
         }
     }
 
@@ -148,7 +146,7 @@ public final class ChatService {
         stopGenerating();
 
         // clear chats
-        chatToolWindowContent.getChatPanel().removeAllChats();
+        SwingUtilities.invokeLater(() -> chatToolWindowContent.getChatPanel().removeChat());
 
         // clear chatId
         chatId = null;
@@ -163,8 +161,20 @@ public final class ChatService {
                 return ChatCell.ofAnswer(message.getContent());
             }
         }).toList();
-        chatToolWindowContent.getChatPanel().replaceAllChats(chatCells);
+        chatToolWindowContent.getChatPanel().replaceChat(chatCells);
 
         this.chatId = chatId;
+    }
+
+    public void regenerate() throws IOException, InterruptedException {
+        ChatPanel chatPanel = chatToolWindowContent.getChatPanel();
+        chatPanel.removeRegenerateLabel();
+        // Delete the latest answer cell
+        ChatCell chatCell = chatPanel.getLatestChatCell();
+        if (!(chatCell == null || chatCell.isAsk())) {
+            chatPanel.removeLatestChatCell();
+        }
+        ChatHttpUtil.trimMessages(this.chatId, "{\"match\":{\"role\":\"user\"}}");
+        this.sendMessage("");
     }
 }

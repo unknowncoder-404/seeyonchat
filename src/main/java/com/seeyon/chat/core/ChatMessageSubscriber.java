@@ -37,8 +37,8 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
     public void onSubscribe(Flow.Subscription subscription) {
         this.subscription = subscription;
         SwingUtilities.invokeLater(() -> {
-            chatPanel.removeLoader();
-            chatPanel.addChat(answer);
+            chatPanel.removeLoadingLabel();
+            chatPanel.addChatCell(answer);
         });
         subscription.request(1);
     }
