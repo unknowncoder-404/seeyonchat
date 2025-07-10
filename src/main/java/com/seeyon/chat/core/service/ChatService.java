@@ -1,8 +1,11 @@
 package com.seeyon.chat.core.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.Strings;
+import com.seeyon.chat.common.ChatConstants;
 import com.seeyon.chat.core.ChatMessageSubscriber;
 import com.seeyon.chat.core.model.Chat;
 import com.seeyon.chat.settings.AppSettingsState;
@@ -27,8 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service(Service.Level.PROJECT)
 public final class ChatService {
 
-    private final Project project;
-
     private final ChatToolWindowContent chatToolWindowContent;
 
     private final AtomicBoolean lock;
@@ -38,8 +39,6 @@ public final class ChatService {
     private CompletableFuture<HttpResponse<Void>> future;
 
     public ChatService(Project project) {
-        this.project = project;
-
         this.chatToolWindowContent = new ChatToolWindowContent(project);
         this.lock = new AtomicBoolean();
     }
@@ -65,18 +64,12 @@ public final class ChatService {
     }
 
     public void sendMessage(String data) {
-        if (data.isEmpty()) {
-            return;
-        }
-        // check settings
-        if (!ChatSettingsUtil.checkSettings()) {
-            return;
-        }
-        if (!lock.compareAndSet(false, true)) {
+        // check
+        if (data.isEmpty() || !ChatSettingsUtil.checkSettings() || !lock.compareAndSet(false, true)) {
             return;
         }
 
-        // add the conversation component to chatBox
+        // add the chat component to chatPanel
         ChatPanel chatPanel = chatToolWindowContent.getChatPanel();
         chatPanel.addChat(ChatCell.ofAsk(data));
 
@@ -84,13 +77,38 @@ public final class ChatService {
         chatToolWindowContent.aroundSend(false);
 
         // send message
+        boolean isNewChat = false;
+        CompletableFuture<Void> completion = new CompletableFuture<>();
         try {
             if (Strings.isEmpty(chatId)) {
                 chatId = createChat();
+                isNewChat = true;
             }
-            future = ChatHttpUtil.sendMessage(chatId, data, new ChatMessageSubscriber(chatPanel, project));
+            ChatMessageSubscriber subscriber = new ChatMessageSubscriber(chatPanel, completion);
+            future = ChatHttpUtil.sendMessage(chatId, data, subscriber);
+            completion = completion.thenRun(this::stopGenerating)
+                    .exceptionally(ex -> {
+                        stopGenerating();
+                        SwingUtilities.invokeLater(() -> NotificationUtil.error(ex.getMessage()));
+                        return null;
+                    });
+            if (isNewChat) {
+                completion = completion.thenCompose(response -> ChatHttpUtil.getSummarizeAsync(chatId))
+                        .thenAccept(response -> {
+                            try {
+                                JsonNode jsonNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
+                                if (jsonNode.has("summary")) {
+                                    ObjectNode bodyJson = ChatConstants.OBJECT_MAPPER.createObjectNode();
+                                    bodyJson.put("title", jsonNode.get("summary").asText());
+                                    ChatHttpUtil.updateChatAsync(chatId, ChatConstants.OBJECT_MAPPER.writeValueAsString(bodyJson));
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        });
+            }
         } catch (Exception e) {
             stopGenerating();
+            completion.cancel(true);
             NotificationUtil.error(e.getMessage());
         }
     }
@@ -125,18 +143,15 @@ public final class ChatService {
         unlock();
     }
 
-    public void createNewChat() throws IOException, InterruptedException {
-        if (!ChatSettingsUtil.checkSettings()) {
-            return;
-        }
+    public void clearCurrentChat() {
         // stop generating
         stopGenerating();
 
         // clear chats
         chatToolWindowContent.getChatPanel().removeAllChats();
 
-        // create new chatId
-        chatId = createChat();
+        // clear chatId
+        chatId = null;
     }
 
     public void recoverChat(String chatId) throws IOException, InterruptedException {

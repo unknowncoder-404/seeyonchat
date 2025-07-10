@@ -79,7 +79,7 @@ public class ChatHistoryCell extends RoundRectPanel {
                     // 如果删除的是当前对话，则新建对话
                     ChatService chatService = ChatService.getInstance(project);
                     if (chatId.equals(chatService.getChatId())) {
-                        chatService.createNewChat();
+                        chatService.clearCurrentChat();
                     }
                 } catch (Exception ex) {
                     NotificationUtil.error(ex.getMessage());

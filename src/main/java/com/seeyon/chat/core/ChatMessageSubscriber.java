@@ -1,18 +1,16 @@
 package com.seeyon.chat.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.intellij.openapi.project.Project;
 import com.seeyon.chat.common.ChatConstants;
-import com.seeyon.chat.core.service.ChatService;
 import com.seeyon.chat.ui.ChatPanel;
 import com.seeyon.chat.ui.ChatCell;
-import com.seeyon.chat.utils.NotificationUtil;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Flow;
 
 /**
@@ -24,13 +22,13 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
 
     private final ChatPanel chatPanel;
 
-    private final Project project;
-
     private final ChatCell answer;
 
-    public ChatMessageSubscriber(ChatPanel chatPanel, Project project) {
+    private final CompletableFuture<Void> completion;
+
+    public ChatMessageSubscriber(ChatPanel chatPanel, CompletableFuture<Void> completion) {
         this.chatPanel = chatPanel;
-        this.project = project;
+        this.completion = completion;
 
         this.answer = ChatCell.ofAnswer();
     }
@@ -79,12 +77,11 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
         if (throwable instanceof IOException) {
             return;
         }
-        ChatService.getInstance(project).stopGenerating();
-        SwingUtilities.invokeLater(() -> NotificationUtil.error(throwable.getMessage()));
+        completion.completeExceptionally(throwable);
     }
 
     @Override
     public void onComplete() {
-        ChatService.getInstance(project).stopGenerating();
+        completion.complete(null);
     }
 }

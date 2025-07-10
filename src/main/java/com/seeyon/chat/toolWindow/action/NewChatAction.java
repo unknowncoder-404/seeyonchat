@@ -5,7 +5,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import com.seeyon.chat.core.service.ChatService;
-import com.seeyon.chat.utils.NotificationUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -29,10 +28,6 @@ public class NewChatAction extends DumbAwareAction {
         if (!contentManager.isSelected(chatContent)) {
             contentManager.setSelectedContent(chatContent);
         }
-        try {
-            ChatService.getInstance(e.getProject()).createNewChat();
-        } catch (Exception ex) {
-            NotificationUtil.error(ex.getMessage());
-        }
+        ChatService.getInstance(e.getProject()).clearCurrentChat();
     }
 }

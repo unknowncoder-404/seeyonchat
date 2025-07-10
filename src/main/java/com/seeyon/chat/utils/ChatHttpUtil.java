@@ -2,6 +2,8 @@ package com.seeyon.chat.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.seeyon.chat.core.model.Chat;
 import com.seeyon.chat.settings.AppSettingsState;
 import com.seeyon.chat.common.ChatConstants;
@@ -14,10 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
@@ -33,13 +32,17 @@ public class ChatHttpUtil {
             .executor(Executors.newSingleThreadExecutor())
             .build();
 
+    private static String[] buildHeaders() {
+        return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
+    }
+
     public static String createChatbot(@NotNull String model) throws IOException, InterruptedException {
-        Map<String, String> map = new HashMap<>();
-        map.put("model", model);
-        map.put("name", ChatBundle.message("chatbot.name", model));
-        map.put("prompt", ChatBundle.message("chatbot.prompt"));
-        map.put("description", ChatBundle.message("chatbot.description"));
-        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
+        ObjectNode bodyJson = ChatConstants.OBJECT_MAPPER.createObjectNode();
+        bodyJson.put("model", model);
+        bodyJson.put("name", ChatBundle.message("chatbot.name", model));
+        bodyJson.put("prompt", ChatBundle.message("chatbot.prompt"));
+        bodyJson.put("description", ChatBundle.message("chatbot.description"));
+        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(bodyJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chatbots"))
@@ -49,19 +52,19 @@ public class ChatHttpUtil {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        Map result = ChatConstants.OBJECT_MAPPER.readValue(response.body(), Map.class);
-        String message = (String) result.get("message");
+        JsonNode jsonNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
+        String message = jsonNode.get("message").asText();
         if ("Chatbot created successfully.".equals(message)) {
-            Map data = (Map) result.get("data");
-            return (String) data.get("_id");
+            return jsonNode.get("data").get("id").asText();
         } else {
             throw new RuntimeException(message);
         }
     }
 
     public static String createChat(@NotNull String chatbotId) throws IOException, InterruptedException {
-        Map<String, String> map = Collections.singletonMap("chatbotId", chatbotId);
-        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
+        ObjectNode bodyJson = ChatConstants.OBJECT_MAPPER.createObjectNode();
+        bodyJson.put("chatbotId", chatbotId);
+        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(bodyJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats"))
@@ -71,19 +74,18 @@ public class ChatHttpUtil {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        Map result = ChatConstants.OBJECT_MAPPER.readValue(response.body(), Map.class);
-        Object id = result.get("_id");
-        if (id == null) {
-            throw new RuntimeException((String) result.get("message"));
+        JsonNode jsonNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
+        if (jsonNode.has("_id")) {
+            return jsonNode.get("_id").asText();
         }
-        return (String) id;
+        throw new RuntimeException(jsonNode.get("message").asText());
     }
 
     public static CompletableFuture<HttpResponse<Void>> sendMessage(@NotNull String chatId, String content, Flow.Subscriber<? super List<ByteBuffer>> subscriber) throws JsonProcessingException {
-        Map<String, String> map = new HashMap<>();
-        map.put("role", "user");
-        map.put("content", content);
-        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(map);
+        ObjectNode bodyJson = ChatConstants.OBJECT_MAPPER.createObjectNode();
+        bodyJson.put("role", "user");
+        bodyJson.put("content", content);
+        String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(bodyJson);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId + "/messages"))
@@ -93,10 +95,6 @@ public class ChatHttpUtil {
                 .timeout(Duration.ofSeconds(30))
                 .build();
         return client.sendAsync(request, HttpResponse.BodyHandlers.fromSubscriber(subscriber));
-    }
-
-    private static String[] buildHeaders() {
-        return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
     }
 
     public static List<Chat> getChats(@NotNull String chatbotId) throws IOException, InterruptedException {
@@ -124,13 +122,32 @@ public class ChatHttpUtil {
         try {
             return ChatConstants.OBJECT_MAPPER.readValue(response.body(), Chat.class);
         } catch (JsonProcessingException e) {
-            Map result = ChatConstants.OBJECT_MAPPER.readValue(response.body(), Map.class);
-            Object message = result.get("message");
-            if (message != null) {
-                throw new RuntimeException((String) message);
+            JsonNode jsonNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
+            if (jsonNode.has("message")) {
+                throw new RuntimeException(jsonNode.get("message").asText());
             }
             throw e;
         }
+    }
+
+    public static CompletableFuture<HttpResponse<String>> getSummarizeAsync(@NotNull String chatId) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId + "/summarize"))
+                .headers(buildHeaders())
+                .GET()
+                .timeout(Duration.ofSeconds(10))
+                .build();
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static CompletableFuture<HttpResponse<String>> updateChatAsync(@NotNull String chatId, @NotNull String body) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/chats/" + chatId))
+                .headers(buildHeaders())
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .timeout(Duration.ofSeconds(10))
+                .build();
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
     }
 
     public static void deleteChat(@NotNull String chatId) throws IOException, InterruptedException {
