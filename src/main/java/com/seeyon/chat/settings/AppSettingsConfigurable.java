@@ -4,6 +4,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.text.Strings;
+import com.seeyon.chat.core.model.Model;
 import com.seeyon.chat.utils.ChatHttpUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -38,20 +39,27 @@ public class AppSettingsConfigurable implements Configurable {
     public boolean isModified() {
         AppSettingsState settings = AppSettingsState.getInstance();
         String apiKeyText = appSettingsComponent.getApiKeyText();
-        return Strings.isNotEmpty(apiKeyText) &&
-                (!apiKeyText.equals(settings.getApiKey()) ||
-                        !appSettingsComponent.getModelSelectedItem().equals(settings.getModel()));
+        if (Strings.isEmpty(apiKeyText)) {
+            return false;
+        }
+        if (!apiKeyText.equals(settings.getApiKey())) {
+            return true;
+        }
+        Model modelSelectedItem = appSettingsComponent.getModelSelectedItem();
+        String modelSelected = modelSelectedItem == null ? "" : modelSelectedItem.getModel();
+        return !settings.getModel().equals(modelSelected);
     }
 
     @Override
     public void apply() throws ConfigurationException {
         AppSettingsState settings = AppSettingsState.getInstance();
         settings.setApiKey(appSettingsComponent.getApiKeyText());
-        settings.setModel(appSettingsComponent.getModelSelectedItem());
+        Model modelSelectedItem = appSettingsComponent.getModelSelectedItem();
+        settings.setModel(modelSelectedItem == null ? "" : modelSelectedItem.getModel());
         if (Strings.isNotEmpty(settings.getApiKey()) && Strings.isEmpty(settings.getChatbotId())) {
             try {
                 // create chatbot
-                String chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+                String chatbotId = ChatHttpUtil.createChatbot(settings.getModel());
                 settings.putChatbotId(chatbotId);
             } catch (Exception ignored) {
             }

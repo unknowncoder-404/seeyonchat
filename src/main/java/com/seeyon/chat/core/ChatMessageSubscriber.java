@@ -57,8 +57,9 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
                 try {
                     // 从当前索引开始解析JSON对象
                     JsonNode node = ChatConstants.OBJECT_MAPPER.readTree(s.substring(index));
-                    if (node.has("content")) {
-                        sb.append(node.get("content").asText());
+                    JsonNode contentNode = node.get("content");
+                    if (!(contentNode == null || contentNode.isNull())) {
+                        sb.append(contentNode.asText());
                     }
                     // 更新索引位置，跳过当前解析的JSON对象
                     // 注意：这里假设每个JSON对象之间没有分隔符，如果有分隔符，需要相应调整
@@ -68,7 +69,9 @@ public class ChatMessageSubscriber implements Flow.Subscriber<List<ByteBuffer>> 
                 }
             }
         }
-        SwingUtilities.invokeLater(() -> answer.append(sb.toString()));
+        if (!sb.isEmpty()) {
+            SwingUtilities.invokeLater(() -> answer.append(sb.toString()));
+        }
         subscription.request(1);
     }
 

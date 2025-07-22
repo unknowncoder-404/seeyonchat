@@ -119,14 +119,14 @@ public final class ChatService {
         AppSettingsState settings = AppSettingsState.getInstance();
         String chatbotId = settings.getChatbotId();
         if (Strings.isEmpty(chatbotId)) {
-            chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+            chatbotId = ChatHttpUtil.createChatbot(settings.getModel());
             settings.putChatbotId(chatbotId);
         }
         try {
             return ChatHttpUtil.createChat(chatbotId);
         } catch (RuntimeException e) {
             // create chatbot
-            chatbotId = ChatHttpUtil.createChatbot(settings.findModel());
+            chatbotId = ChatHttpUtil.createChatbot(settings.getModel());
             settings.putChatbotId(chatbotId);
 
             return ChatHttpUtil.createChat(chatbotId);

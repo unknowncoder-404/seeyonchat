@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.seeyon.chat.core.model.Chat;
+import com.seeyon.chat.core.model.Model;
 import com.seeyon.chat.settings.AppSettingsState;
 import com.seeyon.chat.common.ChatConstants;
 import org.jetbrains.annotations.NotNull;
@@ -37,12 +38,30 @@ public class ChatHttpUtil {
         return new String[]{"Content-Type", "application/json", "Authorization", "Apikey " + AppSettingsState.getInstance().getApiKey()};
     }
 
+    public static List<Model> getModels() throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(ChatConstants.BASE_URL + "/models"))
+                .headers(buildHeaders())
+                .GET()
+                .timeout(Duration.ofSeconds(2))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        JsonNode jsonNode = ChatConstants.OBJECT_MAPPER.readTree(response.body());
+        jsonNode = jsonNode.get("publishedModels");
+        if (jsonNode != null && jsonNode.isArray()) {
+            return ChatConstants.OBJECT_MAPPER.readValue(jsonNode.traverse(), new TypeReference<>() {
+            });
+        }
+        return Collections.emptyList();
+    }
+
     public static String createChatbot(String model) throws IOException, InterruptedException {
         ObjectNode bodyJson = ChatConstants.OBJECT_MAPPER.createObjectNode();
         bodyJson.put("model", model);
-        bodyJson.put("name", ChatBundle.message("chatbot.name", model));
+        bodyJson.put("name", ChatBundle.message("chatbot.name"));
         bodyJson.put("prompt", ChatBundle.message("chatbot.prompt"));
-        bodyJson.put("description", ChatBundle.message("chatbot.description"));
+        bodyJson.put("description", ChatBundle.message("chatbot.description", model));
         String body = ChatConstants.OBJECT_MAPPER.writeValueAsString(bodyJson);
 
         HttpRequest request = HttpRequest.newBuilder()

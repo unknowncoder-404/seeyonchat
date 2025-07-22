@@ -5,8 +5,10 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPasswordField;
 import com.intellij.util.ui.FormBuilder;
 import com.seeyon.chat.common.ChatConstants;
+import com.seeyon.chat.core.model.Model;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Supports creating and managing a {@link JPanel} for the Settings Dialog.
@@ -15,11 +17,22 @@ public class AppSettingsComponent {
 
     private final JPanel mainPanel;
     private final JBPasswordField apiKeyField = new JBPasswordField();
-    private final JComboBox<String> modelCombobox;
+    private final JComboBox<Model> modelCombobox;
 
     public AppSettingsComponent() {
-        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(ChatConstants.MODEL_MAP.keySet().toArray(new String[0]));
-        modelCombobox = new ComboBox<>(comboBoxModel);
+        modelCombobox = new ComboBox<>(ChatConstants.getModels().toArray(new Model[0]));
+        // 设置自定义渲染器
+        modelCombobox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Model model) {
+                    setText(model.findName());
+                    setToolTipText(model.findDescription());
+                }
+                return this;
+            }
+        });
 
         mainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("API key"), apiKeyField)
@@ -44,11 +57,14 @@ public class AppSettingsComponent {
         apiKeyField.setText(apiKey);
     }
 
-    public String getModelSelectedItem() {
-        return (String) modelCombobox.getSelectedItem();
+    public Model getModelSelectedItem() {
+        return (Model) modelCombobox.getSelectedItem();
     }
 
     public void setModelSelectedItem(String model) {
-        modelCombobox.setSelectedItem(model);
+        Model item = ChatConstants.getModel(model);
+        if (item != null) {
+            modelCombobox.setSelectedItem(item);
+        }
     }
 }
